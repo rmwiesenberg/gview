@@ -1,6 +1,13 @@
 import DeckGL from '@deck.gl/react/typed';
 import {TileLayer} from '@deck.gl/geo-layers/typed';
 import {BitmapLayer} from '@deck.gl/layers/typed';
+import {ViewState} from "./core/ViewState";
+
+const initialViewState: ViewState = {
+  longitude: -83.0,
+  latitude: 42.33,
+  zoom: 11
+}
 
 function App() {
   const layer = new TileLayer({
@@ -24,7 +31,7 @@ function App() {
     },
   });
 
-  return <DeckGL initialViewState={{latitude:40.7, longitude:-74, zoom:11}} layers={[layer]} />;
+  return <DeckGL initialViewState={initialViewState} layers={[layer]} controller={true} />;
 }
 
 export default App;
