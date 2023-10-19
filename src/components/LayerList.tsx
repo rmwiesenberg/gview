@@ -19,6 +19,7 @@ import React, { Dispatch, SetStateAction } from 'react'
 import { GeoLayer } from '../core/GeoLayer'
 import { styled } from '@mui/material/styles'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { AddLayerDialog } from './AddLayerDialog'
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean
@@ -75,7 +76,14 @@ export const LayerList = (
     layers: GeoLayer[],
     setLayers: Dispatch<SetStateAction<GeoLayer[]>>
 ) => {
+    const [addLayer, setAddLayer] = React.useState(false)
     const [expanded, setExpanded] = React.useState(true)
+
+    const handleCloseAddLayer = (newLayer?: GeoLayer) => {
+        setAddLayer(false)
+        if (newLayer == null) return
+        setLayers([newLayer, ...layers])
+    }
 
     const handleExpandClick = () => {
         setExpanded(!expanded)
@@ -112,31 +120,40 @@ export const LayerList = (
     }
 
     return (
-        <Card>
-            <CardHeader
-                action={
-                    <IconButton aria-label="add layer">
-                        <AddIcon />
-                    </IconButton>
-                }
-                title="Layers"
-            />
-            <CardActions disableSpacing>
-                <Box sx={{ ml: 2 }}>{layers.length} layer(s)</Box>
-                <ExpandMore
-                    expand={expanded}
-                    onClick={handleExpandClick}
-                    aria-expanded={expanded}
-                    aria-label="show more"
-                >
-                    <ExpandMoreIcon />
-                </ExpandMore>
-            </CardActions>
-            <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent>
-                    <List>{getLayerItems()}</List>
-                </CardContent>
-            </Collapse>
-        </Card>
+        <div>
+            <Card>
+                <CardHeader
+                    action={
+                        <IconButton
+                            aria-label="add layer"
+                            onClick={() => setAddLayer(true)}
+                        >
+                            <AddIcon />
+                        </IconButton>
+                    }
+                    title="Layers"
+                />
+                <CardActions disableSpacing>
+                    <Box sx={{ ml: 2 }}>{layers.length} layer(s)</Box>
+                    <ExpandMore
+                        expand={expanded}
+                        onClick={handleExpandClick}
+                        aria-expanded={expanded}
+                        aria-label="show more"
+                    >
+                        <ExpandMoreIcon />
+                    </ExpandMore>
+                </CardActions>
+                <Collapse in={expanded} timeout="auto" unmountOnExit>
+                    <CardContent>
+                        <List>{getLayerItems()}</List>
+                    </CardContent>
+                </Collapse>
+            </Card>
+            {AddLayerDialog({
+                open: addLayer,
+                onClose: handleCloseAddLayer,
+            })}
+        </div>
     )
 }
