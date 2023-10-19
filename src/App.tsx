@@ -22,7 +22,8 @@ const initialLayers: GeoLayer[] = [
 ]
 
 function App() {
-    const [layers, setLayers] = React.useState(initialLayers)
+
+  const [layers, setLayers] = React.useState(initialLayers)
 
     let activeLayers = []
     for (const layer of layers) {
