@@ -1,111 +1,52 @@
-import DeckGL from '@deck.gl/react/typed';
-import {styled} from '@mui/material/styles';
-import {TileLayer} from '@deck.gl/geo-layers/typed';
-import {BitmapLayer} from '@deck.gl/layers/typed';
-import {ViewState} from "./core/ViewState";
-import {
-  Box,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Collapse,
-  IconButton,
-  IconButtonProps,
-  List, ListItem, ListItemText,
-} from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import React from "react";
-import {GeoLayer} from "./core/GeoLayer";
+import DeckGL from '@deck.gl/react/typed'
+import { ViewState } from './core/ViewState'
+import { Box } from '@mui/material'
+import React from 'react'
+import { GeoLayer, TileGeoLayer } from './core/GeoLayer'
+import { LayerList } from './components/LayerList'
 
 const initialViewState: ViewState = {
-  longitude: -83.0,
-  latitude: 42.33,
-  zoom: 11
+    longitude: -83.0,
+    latitude: 42.33,
+    zoom: 11,
 }
 
 const initialLayers: GeoLayer[] = [
-  {
-    active: true,
-    layer: new TileLayer({
-      id: 'OpenStreetMap',
-      data: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-
-      maxZoom: 19,
-      minZoom: 0,
-
-      renderSubLayers: props => {
-        const {
-          // @ts-ignore
-          bbox: {west, south, east, north}
-        } = props.tile;
-
-        return new BitmapLayer(props, {
-          data: undefined,
-          image: props.data,
-          bounds: [west, south, east, north]
-        });
-      },
-    })},
-];
-
-interface ExpandMoreProps extends IconButtonProps {
-  expand: boolean;
-}
-
-const ExpandMore = styled((props: ExpandMoreProps) => {
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-  transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-  marginLeft: 'auto',
-  transition: theme.transitions.create('transform', {
-    duration: theme.transitions.duration.shortest,
-  }),
-}));
+    new TileGeoLayer({
+        name: 'OpenStreetMap',
+        active: true,
+        url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        minZoom: 0,
+        maxZoom: 19,
+    }),
+]
 
 function App() {
-  const [expanded, setExpanded] = React.useState(true);
-  const [layers, setLayers] = React.useState(initialLayers)
+    const [layers, setLayers] = React.useState(initialLayers)
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
+    let activeLayers = []
+    for (const layer of layers) {
+        if (layer.active) {
+            activeLayers.push(layer)
+        }
+    }
 
-  return <div>
-    <Box p={3}>
-      <Card sx={{minWidth: 150, maxWidth: 300}} style={{position:"relative", zIndex: "1"}}>
-        <CardHeader
-            action={
-              <IconButton aria-label="add layer">
-                <AddIcon />
-              </IconButton>
-            }
-            title="Layers"
-        />
-        <CardActions disableSpacing>
-          <ExpandMore
-              expand={expanded}
-              onClick={handleExpandClick}
-              aria-expanded={expanded}
-              aria-label="show more"
-          >
-            {layers.length} layer(s)
-            <ExpandMoreIcon />
-          </ExpandMore>
-        </CardActions>
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <CardContent>
-            <List>
-              {layers.map((l) => <ListItem><ListItemText primary={l.layer.id} /></ListItem>)}
-            </List>
-          </CardContent>
-        </Collapse>
-      </Card>
-    </Box>
-    <DeckGL initialViewState={initialViewState} layers={layers.map((l) => l.layer)} controller={true} />
-  </div>;
+    return (
+        <div>
+            <Box
+                p={3}
+                sx={{ minWidth: 150, maxWidth: 300 }}
+                style={{ position: 'relative', zIndex: '1' }}
+            >
+                {LayerList(layers, setLayers)}
+            </Box>
+            <DeckGL
+                initialViewState={initialViewState}
+                layers={activeLayers.map((l) => l.makeLayer())}
+                controller={true}
+            />
+        </div>
+    )
 }
 
-export default App;
+export default App
