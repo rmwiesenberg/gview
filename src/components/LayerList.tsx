@@ -35,14 +35,22 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
     }),
 }))
 
-const LayerItem = (layer: GeoLayer, handleToggle: CallableFunction) => {
+const LayerItem = (
+    layer: GeoLayer,
+    handleToggle: CallableFunction,
+    handleDelete: CallableFunction
+) => {
     const labelId = `layer-list-item-${layer.name}`
 
     return (
         <ListItem
             key={layer.name}
             secondaryAction={
-                <IconButton edge="end" aria-label="delete">
+                <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => handleDelete()}
+                >
                     <DeleteIcon />
                 </IconButton>
             }
@@ -78,15 +86,26 @@ export const LayerList = (
         for (let i = 0; i < layers.length; i++) {
             const layer = layers[i]
             listItems.push(
-                LayerItem(layer, () => {
-                    layer.active = !layer.active
-                    console.log(`Toggle layer active ${layer}`)
-                    setLayers([
-                        ...layers.slice(0, i),
-                        layer,
-                        ...layers.slice(i + 1),
-                    ])
-                })
+                LayerItem(
+                    layer,
+                    () => {
+                        layer.active = !layer.active
+                        console.log(`Toggle layer active ${layer}`)
+                        setLayers([
+                            ...layers.slice(0, i),
+                            layer,
+                            ...layers.slice(i + 1),
+                        ])
+                    },
+                    () => {
+                        layer.active = !layer.active
+                        console.log(`Remove layer ${layer}`)
+                        setLayers([
+                            ...layers.slice(0, i),
+                            ...layers.slice(i + 1),
+                        ])
+                    }
+                )
             )
         }
         return listItems
