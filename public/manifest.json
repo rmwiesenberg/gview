@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Geo Viewer",
+  "name": "Geo Viewer for 2D and 3D GIS applications",
   "icons": [
     {
       "src": "favicon.ico",
