@@ -11,9 +11,6 @@ import {
 } from '@mui/material'
 import { FormContainer, TextFieldElement } from 'react-hook-form-mui'
 import React, { useCallback } from 'react'
-import { parse } from '@loaders.gl/core'
-import { _GeoJSONLoader } from '@loaders.gl/json'
-import type { GeoJSON } from 'geojson'
 
 type CloseFormCallback = (newLayers?: GeoLayer[]) => void
 
@@ -116,15 +113,8 @@ const AddFileLayerForm = (submit: CloseFormCallback) => {
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         let newLayers: FeaturesGeoLayer[] = []
         for (const file of acceptedFiles) {
-            const data = await parse(file, _GeoJSONLoader)
-            console.log(data)
-            newLayers.push(
-                new FeaturesGeoLayer({
-                    name: file.name,
-                    active: true,
-                    features: data.features,
-                })
-            )
+            const newLayer = await FeaturesGeoLayer.fromFile(file)
+            if (newLayer != null) newLayers.push(newLayer)
         }
         submit(newLayers)
     }, [])

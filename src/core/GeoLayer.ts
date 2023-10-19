@@ -2,6 +2,9 @@ import { TileLayer } from '@deck.gl/geo-layers/typed'
 import { GeoJsonLayer } from '@deck.gl/layers/typed'
 import { BitmapLayer } from '@deck.gl/layers/typed'
 import type { Feature } from 'geojson'
+import { load } from '@loaders.gl/core'
+import { _GeoJSONLoader } from '@loaders.gl/json'
+import { GeoPackageLoader } from '@loaders.gl/geopackage'
 
 export interface GeoLayer {
     name: string
@@ -76,6 +79,29 @@ export class FeaturesGeoLayer implements GeoLayer {
         this.name = name
         this.active = active
         this.features = features
+    }
+
+    static async fromFile(file: File): Promise<FeaturesGeoLayer | null> {
+        const gpkgData = await load(file, [_GeoJSONLoader, GeoPackageLoader], {
+            geopackage: {
+                sqlJsCDN:
+                    'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/',
+            },
+            gis: {
+                format: 'geojson',
+                reproject: true,
+                _targetCrs: 'WGS84',
+            },
+        })
+        console.log(gpkgData)
+
+        if (gpkgData == null) return null
+
+        return new FeaturesGeoLayer({
+            name: file.name,
+            active: true,
+            features: gpkgData.features,
+        })
     }
 
     makeLayer(): GeoJsonLayer {

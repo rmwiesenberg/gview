@@ -5,8 +5,9 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@loaders.gl/core": "^3.4.14",
-    "@loaders.gl/json": "^3.4.14",
+    "@loaders.gl/core": "3.0.14",
+    "@loaders.gl/geopackage": "3.0.14",
+    "@loaders.gl/json": "3.0.14",
     "@mui/icons-material": "^5.14.14",
     "@mui/material": "^5.14.14",
     "@mui/x-date-pickers": "^6.16.2",
