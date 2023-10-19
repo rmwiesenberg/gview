@@ -79,10 +79,10 @@ export const LayerList = (
     const [addLayer, setAddLayer] = React.useState(false)
     const [expanded, setExpanded] = React.useState(true)
 
-    const handleCloseAddLayer = (newLayer?: GeoLayer) => {
+    const handleCloseAddLayer = (newLayers?: GeoLayer[]) => {
         setAddLayer(false)
-        if (newLayer == null) return
-        setLayers([newLayer, ...layers])
+        if (newLayers == null) return
+        setLayers([...newLayers, ...layers])
     }
 
     const handleExpandClick = () => {

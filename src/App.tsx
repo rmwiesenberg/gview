@@ -22,8 +22,7 @@ const initialLayers: GeoLayer[] = [
 ]
 
 function App() {
-
-  const [layers, setLayers] = React.useState(initialLayers)
+    const [layers, setLayers] = React.useState(initialLayers)
 
     let activeLayers = []
     for (const layer of layers) {
@@ -43,7 +42,7 @@ function App() {
             </Box>
             <DeckGL
                 initialViewState={initialViewState}
-                layers={activeLayers.map((l) => l.makeLayer())}
+                layers={activeLayers.map((l) => l.makeLayer()).reverse()}
                 controller={true}
             />
         </div>
