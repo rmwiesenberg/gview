@@ -82,17 +82,21 @@ export class FeaturesGeoLayer implements GeoLayer {
     }
 
     static async fromFile(file: File): Promise<FeaturesGeoLayer | null> {
-        const gpkgData = await load(file, [_GeoJSONLoader, GeoPackageLoader], {
-            geopackage: {
-                sqlJsCDN:
-                    'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/',
-            },
-            gis: {
-                format: 'geojson',
-                reproject: true,
-                _targetCrs: 'WGS84',
-            },
-        })
+        const gpkgData: any = await load(
+            file,
+            [_GeoJSONLoader, GeoPackageLoader],
+            {
+                geopackage: {
+                    sqlJsCDN:
+                        'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/',
+                },
+                gis: {
+                    format: 'geojson',
+                    reproject: true,
+                    _targetCrs: 'WGS84',
+                },
+            }
+        )
         console.log(gpkgData)
 
         if (gpkgData == null) return null
