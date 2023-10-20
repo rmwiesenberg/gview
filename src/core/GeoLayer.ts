@@ -100,24 +100,46 @@ export class FeaturesGeoLayer implements GeoLayer {
 
 export const geoLayerFromFile = async (
     file: File
-): Promise<GeoLayer | null> => {
-    const gpkgData: any = await load(file, [_GeoJSONLoader, GeoPackageLoader], {
+): Promise<GeoLayer[] | null> => {
+    const options = {
         geopackage: {
-            sqlJsCDN: 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/',
+            sqlJsCDN: 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/',
         },
         gis: {
             format: 'geojson',
             reproject: true,
             _targetCrs: 'WGS84',
         },
-    })
-    console.log(gpkgData)
+    }
 
-    if (gpkgData == null) return null
+    let ext = file.name.toLowerCase().split('.').pop()
+    console.log(`Loading ${ext} file`)
 
-    return new FeaturesGeoLayer({
-        name: file.name,
-        active: true,
-        features: gpkgData.features,
-    })
+    let layers: GeoLayer[] | null = null
+    switch (ext) {
+        case 'geojson':
+            const geojson = await load(file, _GeoJSONLoader, options)
+            layers = [
+                new FeaturesGeoLayer({
+                    name: file.name,
+                    active: true,
+                    features: geojson.features,
+                }),
+            ]
+            break
+        case 'gpkg':
+            const geopackage: any = await load(file, GeoPackageLoader, options)
+            layers = []
+            for (let layerName in geopackage) {
+                layers.push(
+                    new FeaturesGeoLayer({
+                        name: `${file.name}-${layerName}`,
+                        active: true,
+                        features: geopackage[layerName],
+                    })
+                )
+            }
+            break
+    }
+    return layers
 }
