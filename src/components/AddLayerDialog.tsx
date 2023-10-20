@@ -1,4 +1,9 @@
-import { FeaturesGeoLayer, GeoLayer, TileGeoLayer } from '../core/GeoLayer'
+import {
+    FeaturesGeoLayer,
+    GeoLayer,
+    geoLayerFromFile,
+    TileGeoLayer,
+} from '../core/GeoLayer'
 import { useDropzone } from 'react-dropzone'
 import {
     Box,
@@ -111,9 +116,9 @@ const AddXYZTileLayer = (submit: CloseFormCallback) => {
 
 const AddFileLayerForm = (submit: CloseFormCallback) => {
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
-        let newLayers: FeaturesGeoLayer[] = []
+        let newLayers: GeoLayer[] = []
         for (const file of acceptedFiles) {
-            const newLayer = await FeaturesGeoLayer.fromFile(file)
+            const newLayer = await geoLayerFromFile(file)
             if (newLayer != null) newLayers.push(newLayer)
         }
         submit(newLayers)

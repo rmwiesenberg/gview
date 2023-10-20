@@ -81,33 +81,6 @@ export class FeaturesGeoLayer implements GeoLayer {
         this.features = features
     }
 
-    static async fromFile(file: File): Promise<FeaturesGeoLayer | null> {
-        const gpkgData: any = await load(
-            file,
-            [_GeoJSONLoader, GeoPackageLoader],
-            {
-                geopackage: {
-                    sqlJsCDN:
-                        'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/',
-                },
-                gis: {
-                    format: 'geojson',
-                    reproject: true,
-                    _targetCrs: 'WGS84',
-                },
-            }
-        )
-        console.log(gpkgData)
-
-        if (gpkgData == null) return null
-
-        return new FeaturesGeoLayer({
-            name: file.name,
-            active: true,
-            features: gpkgData.features,
-        })
-    }
-
     makeLayer(): GeoJsonLayer {
         return new GeoJsonLayer({
             data: this.features,
@@ -123,4 +96,28 @@ export class FeaturesGeoLayer implements GeoLayer {
             getElevation: 30,
         })
     }
+}
+
+export const geoLayerFromFile = async (
+    file: File
+): Promise<GeoLayer | null> => {
+    const gpkgData: any = await load(file, [_GeoJSONLoader, GeoPackageLoader], {
+        geopackage: {
+            sqlJsCDN: 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/',
+        },
+        gis: {
+            format: 'geojson',
+            reproject: true,
+            _targetCrs: 'WGS84',
+        },
+    })
+    console.log(gpkgData)
+
+    if (gpkgData == null) return null
+
+    return new FeaturesGeoLayer({
+        name: file.name,
+        active: true,
+        features: gpkgData.features,
+    })
 }
