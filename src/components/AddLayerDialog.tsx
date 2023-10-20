@@ -11,6 +11,7 @@ import {
 } from '@mui/material'
 import { FormContainer, TextFieldElement } from 'react-hook-form-mui'
 import React, { useCallback } from 'react'
+import { DropzoneArea } from 'react-mui-dropzone'
 
 type CloseFormCallback = (newLayers?: GeoLayer[]) => void
 
@@ -110,27 +111,23 @@ const AddXYZTileLayer = (submit: CloseFormCallback) => {
 }
 
 const AddFileLayerForm = (submit: CloseFormCallback) => {
-    const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const handleChange = async (files: File[]) => {
+        if (files.length == 0) return
         let newLayers: GeoLayer[] = []
-        for (const file of acceptedFiles) {
+        for (const file of files) {
             const layersFromFile = await geoLayerFromFile(file)
             if (layersFromFile != null) newLayers.push(...layersFromFile)
         }
         submit(newLayers)
-    }, [])
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
-    })
+    }
 
     return (
-        <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            {isDragActive ? (
-                <p>Drop the files here ...</p>
-            ) : (
-                <p>Drag 'n' drop some files here, or click to select files</p>
-            )}
-        </div>
+        <DropzoneArea
+            acceptedFiles={['.gpkg', '.geojson']}
+            maxFileSize={1024 * 10e6}
+            dropzoneText={'Drag and drop an file here or click'}
+            onChange={handleChange.bind(this)}
+        />
     )
 }
 
@@ -142,32 +139,23 @@ export const AddLayerDialog = (props: AddLayerProps) => {
     return (
         <Dialog onClose={() => onClose()} open={open}>
             <DialogTitle>Add Layer</DialogTitle>
-            <Container sx={{ minWidth: 480, height: 500 }}>
+            <Container sx={{ minWidth: 480 }}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs
                         value={value}
                         onChange={(_, newValue) => setValue(newValue)}
-                        aria-label="basic tabs example"
+                        aria-label="Add Layer Tabs"
                     >
                         <Tab label="XYZ Tile Server" {...a11yProps(0)} />
                         <Tab label="File Upload" {...a11yProps(1)} />
                     </Tabs>
                 </Box>
-                <Box
-                    sx={{
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <Box sx={{ height: '100%' }}></Box>
-                    <CustomTabPanel value={value} index={0}>
-                        {AddXYZTileLayer(onClose)}
-                    </CustomTabPanel>
-                    <CustomTabPanel value={value} index={1}>
-                        {AddFileLayerForm(onClose)}
-                    </CustomTabPanel>
-                    <Box sx={{ height: '100%' }}></Box>
-                </Box>
+                <CustomTabPanel value={value} index={0}>
+                    {AddXYZTileLayer(onClose)}
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={1}>
+                    {AddFileLayerForm(onClose)}
+                </CustomTabPanel>
             </Container>
         </Dialog>
     )
