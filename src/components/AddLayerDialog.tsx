@@ -1,5 +1,4 @@
 import { GeoLayer, geoLayerFromFile, TileGeoLayer } from '../core/GeoLayer'
-import { useDropzone } from 'react-dropzone'
 import {
     Box,
     Button,
@@ -10,7 +9,7 @@ import {
     Tabs,
 } from '@mui/material'
 import { FormContainer, TextFieldElement } from 'react-hook-form-mui'
-import React, { useCallback } from 'react'
+import React from 'react'
 import { DropzoneArea } from 'react-mui-dropzone'
 
 type CloseFormCallback = (newLayers?: GeoLayer[]) => void

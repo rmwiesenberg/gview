@@ -1,6 +1,5 @@
 import { TileLayer } from '@deck.gl/geo-layers/typed'
-import { GeoJsonLayer } from '@deck.gl/layers/typed'
-import { BitmapLayer } from '@deck.gl/layers/typed'
+import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers/typed'
 import type { Feature } from 'geojson'
 import { load } from '@loaders.gl/core'
 import { _GeoJSONLoader } from '@loaders.gl/json'
