@@ -1,6 +1,7 @@
 {
-  "name": "gis",
+  "name": "gview",
   "version": "0.1.0",
+  "homepage": "https://rmwiesenberg.gihub.io/gview",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -45,10 +46,13 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "devDependencies": {
-    "react-app-rewired": "^2.2.1"
+    "react-app-rewired": "^2.2.1",
+    "gh-pages": "^6.0.0"
   },
   "eslintConfig": {
     "extends": [
