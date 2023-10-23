@@ -1,0 +1,40 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.65,
+          35.6764,
+          100
+        ]
+      },
+      "properties": {
+        "name": "Tokyo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "coordinates": [
+          [
+            -71.05482678209843,
+            42.353268534410205,
+            140
+          ],
+          [
+            -75.16265988808395,
+            39.94778072283836,
+            120
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties":  {
+        "name": "Boston to Philly"
+      }
+    }
+  ]
+}

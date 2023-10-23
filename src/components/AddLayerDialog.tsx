@@ -111,7 +111,7 @@ const AddXYZTileLayer = (submit: CloseFormCallback) => {
 
 const AddFileLayerForm = (submit: CloseFormCallback) => {
     const handleChange = async (files: File[]) => {
-        if (files.length == 0) return
+        if (files.length === 0) return
         let newLayers: GeoLayer[] = []
         for (const file of files) {
             const layersFromFile = await geoLayerFromFile(file)

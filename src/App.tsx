@@ -9,6 +9,8 @@ const initialViewState: ViewState = {
     longitude: -83.0,
     latitude: 42.33,
     zoom: 11,
+    pitch: 30,
+    maxPitch: 85,
 }
 
 const initialLayers: GeoLayer[] = [

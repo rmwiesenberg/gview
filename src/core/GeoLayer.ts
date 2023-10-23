@@ -86,13 +86,12 @@ export class FeaturesGeoLayer implements GeoLayer {
             pickable: true,
             stroked: false,
             filled: true,
-            extruded: true,
             pointType: 'circle',
             lineWidthScale: 20,
             lineWidthMinPixels: 2,
-            getPointRadius: 100,
+            pointRadiusMinPixels: 1,
             getLineWidth: 1,
-            getElevation: 30,
+            opacity: 0.8,
         })
     }
 }
