@@ -4,6 +4,8 @@ import type { Feature } from 'geojson'
 import { load } from '@loaders.gl/core'
 import { _GeoJSONLoader } from '@loaders.gl/json'
 import { GeoPackageLoader } from '@loaders.gl/geopackage'
+import bbox from '@turf/bbox'
+import { featureCollection } from '@turf/helpers'
 
 type SetHoverInfoCallback = (info: any) => void
 
@@ -83,10 +85,16 @@ export class FeaturesGeoLayer implements GeoLayer {
         this.name = name
         this.active = active
         this.features = features
+
+        const layerBBox = bbox(featureCollection(this.features))
+        this.bounds = [
+            [layerBBox[0], layerBBox[1]],
+            [layerBBox[2], layerBBox[3]],
+        ]
     }
 
     makeLayer(setHoverInfo: SetHoverInfoCallback): GeoJsonLayer {
-        const layer = new GeoJsonLayer({
+        return new GeoJsonLayer({
             data: this.features,
             pickable: true,
             stroked: false,
@@ -103,9 +111,6 @@ export class FeaturesGeoLayer implements GeoLayer {
                 setHoverInfo(info)
             },
         })
-        const bounds = layer.getBounds()
-        if (bounds != null) this.bounds = bounds
-        return layer
     }
 }
 

@@ -10,7 +10,7 @@ const INITIAL_VIEW_STATE: ViewState = {
     latitude: 42.33,
     zoom: 11,
     pitch: 30,
-    maxPitch: 85,
+    maxPitch: 89.9,
 }
 
 const initialLayers: GeoLayer[] = [
@@ -47,6 +47,7 @@ function App() {
             </Box>
             <DeckGL
                 initialViewState={initialViewState}
+                viewState={false}
                 layers={activeLayers
                     .map((l) => l.makeLayer(setHoverInfo))
                     .reverse()}
