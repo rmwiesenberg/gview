@@ -25,6 +25,7 @@ const initialLayers: GeoLayer[] = [
 
 function App() {
     const [layers, setLayers] = React.useState(initialLayers)
+    const [hoverInfo, setHoverInfo] = React.useState<any>({})
 
     let activeLayers = []
     for (const layer of layers) {
@@ -44,9 +45,24 @@ function App() {
             </Box>
             <DeckGL
                 initialViewState={initialViewState}
-                layers={activeLayers.map((l) => l.makeLayer()).reverse()}
+                layers={activeLayers
+                    .map((l) => l.makeLayer(setHoverInfo))
+                    .reverse()}
                 controller={true}
             />
+            {hoverInfo.object && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        zIndex: 1,
+                        pointerEvents: 'none',
+                        left: hoverInfo.x,
+                        top: hoverInfo.y,
+                    }}
+                >
+                    {JSON.stringify(hoverInfo.object.properties)}
+                </div>
+            )}
         </div>
     )
 }

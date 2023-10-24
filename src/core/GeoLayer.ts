@@ -5,11 +5,13 @@ import { load } from '@loaders.gl/core'
 import { _GeoJSONLoader } from '@loaders.gl/json'
 import { GeoPackageLoader } from '@loaders.gl/geopackage'
 
+type SetHoverInfoCallback = (info: any) => void
+
 export interface GeoLayer {
     name: string
     active: boolean
 
-    makeLayer: () => TileLayer | GeoJsonLayer
+    makeLayer: (setHoverInfo: SetHoverInfoCallback) => TileLayer | GeoJsonLayer
 }
 
 export class TileGeoLayer implements GeoLayer {
@@ -80,7 +82,7 @@ export class FeaturesGeoLayer implements GeoLayer {
         this.features = features
     }
 
-    makeLayer(): GeoJsonLayer {
+    makeLayer(setHoverInfo: SetHoverInfoCallback): GeoJsonLayer {
         return new GeoJsonLayer({
             data: this.features,
             pickable: true,
@@ -92,6 +94,11 @@ export class FeaturesGeoLayer implements GeoLayer {
             pointRadiusMinPixels: 1,
             getLineWidth: 1,
             opacity: 0.8,
+            getPosition: (d: any) => d.position,
+            onHover: (info) => {
+                console.log(info)
+                setHoverInfo(info)
+            },
         })
     }
 }
