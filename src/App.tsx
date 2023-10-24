@@ -5,7 +5,7 @@ import React from 'react'
 import { GeoLayer, TileGeoLayer } from './core/GeoLayer'
 import { LayerList } from './components/LayerList'
 
-const initialViewState: ViewState = {
+const INITIAL_VIEW_STATE: ViewState = {
     longitude: -83.0,
     latitude: 42.33,
     zoom: 11,
@@ -24,6 +24,8 @@ const initialLayers: GeoLayer[] = [
 ]
 
 function App() {
+    const [initialViewState, setInitialViewState] =
+        React.useState(INITIAL_VIEW_STATE)
     const [layers, setLayers] = React.useState(initialLayers)
     const [hoverInfo, setHoverInfo] = React.useState<any>({})
 
@@ -41,7 +43,7 @@ function App() {
                 sx={{ minWidth: 150, maxWidth: 300 }}
                 style={{ position: 'relative', zIndex: '1' }}
             >
-                {LayerList(layers, setLayers)}
+                {LayerList(layers, setLayers, setInitialViewState)}
             </Box>
             <DeckGL
                 initialViewState={initialViewState}

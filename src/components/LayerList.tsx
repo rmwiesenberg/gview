@@ -20,6 +20,7 @@ import { GeoLayer } from '../core/GeoLayer'
 import { styled } from '@mui/material/styles'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { AddLayerDialog } from './AddLayerDialog'
+import { ViewState } from '../core/ViewState'
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean
@@ -39,13 +40,15 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 const LayerItem = (
     layer: GeoLayer,
     handleToggle: CallableFunction,
-    handleDelete: CallableFunction
+    handleDelete: CallableFunction,
+    handleClick: CallableFunction
 ) => {
     const labelId = `layer-list-item-${layer.name}`
 
     return (
         <ListItem
             key={layer.name}
+            onClick={() => handleClick(layer)}
             secondaryAction={
                 <IconButton
                     edge="end"
@@ -74,7 +77,8 @@ const LayerItem = (
 
 export const LayerList = (
     layers: GeoLayer[],
-    setLayers: Dispatch<SetStateAction<GeoLayer[]>>
+    setLayers: Dispatch<SetStateAction<GeoLayer[]>>,
+    setInitialViewState: React.Dispatch<React.SetStateAction<ViewState>>
 ) => {
     const [addLayer, setAddLayer] = React.useState(false)
     const [expanded, setExpanded] = React.useState(true)
@@ -112,6 +116,18 @@ export const LayerList = (
                             ...layers.slice(0, i),
                             ...layers.slice(i + 1),
                         ])
+                    },
+                    () => {
+                        if (!layer.active) return
+                        const bounds = layer.bounds
+                        if (bounds == null) return
+                        let lng = (bounds[0][0] + bounds[1][0]) / 2
+                        let lat = (bounds[0][1] + bounds[1][1]) / 2
+                        setInitialViewState((viewState) => ({
+                            ...viewState,
+                            longitude: lng,
+                            latitude: lat,
+                        }))
                     }
                 )
             )

@@ -10,6 +10,7 @@ type SetHoverInfoCallback = (info: any) => void
 export interface GeoLayer {
     name: string
     active: boolean
+    bounds: [number[], number[]] | null
 
     makeLayer: (setHoverInfo: SetHoverInfoCallback) => TileLayer | GeoJsonLayer
 }
@@ -20,6 +21,7 @@ export class TileGeoLayer implements GeoLayer {
     url: string
     minZoom: number
     maxZoom: number
+    bounds = null
 
     constructor({
         name,
@@ -67,6 +69,7 @@ export class FeaturesGeoLayer implements GeoLayer {
     name: string
     active: boolean
     features: Feature[]
+    bounds: [number[], number[]] | null = null
 
     constructor({
         name,
@@ -83,7 +86,7 @@ export class FeaturesGeoLayer implements GeoLayer {
     }
 
     makeLayer(setHoverInfo: SetHoverInfoCallback): GeoJsonLayer {
-        return new GeoJsonLayer({
+        const layer = new GeoJsonLayer({
             data: this.features,
             pickable: true,
             stroked: false,
@@ -100,6 +103,9 @@ export class FeaturesGeoLayer implements GeoLayer {
                 setHoverInfo(info)
             },
         })
+        const bounds = layer.getBounds()
+        if (bounds != null) this.bounds = bounds
+        return layer
     }
 }
 
