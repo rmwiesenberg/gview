@@ -91,6 +91,8 @@ export class FeaturesGeoLayer implements GeoLayer {
             [layerBBox[0], layerBBox[1]],
             [layerBBox[2], layerBBox[3]],
         ]
+
+        console.log(`New layer ${this.name} with bounds ${this.bounds}`)
     }
 
     makeLayer(setHoverInfo: SetHoverInfoCallback): GeoJsonLayer {
@@ -100,10 +102,8 @@ export class FeaturesGeoLayer implements GeoLayer {
             stroked: false,
             filled: true,
             pointType: 'circle',
-            lineWidthScale: 20,
-            lineWidthMinPixels: 2,
+            lineWidthMinPixels: 1,
             pointRadiusMinPixels: 1,
-            getLineWidth: 1,
             opacity: 0.8,
             getPosition: (d: any) => d.position,
             onHover: (info) => {

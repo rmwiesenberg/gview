@@ -12,7 +12,8 @@
         ]
       },
       "properties": {
-        "name": "Tokyo"
+        "name": "Tokyo",
+        "county": "JP"
       }
     },
     {
@@ -33,7 +34,8 @@
         "type": "LineString"
       },
       "properties":  {
-        "name": "Boston to Philly"
+        "name": "Boston to Philly",
+        "country": "US"
       }
     }
   ]

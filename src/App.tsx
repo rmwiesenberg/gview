@@ -36,6 +36,10 @@ function App() {
         }
     }
 
+    console.log(
+        `Using initial view state of ${JSON.stringify(initialViewState)}`
+    )
+
     return (
         <div>
             <Box
@@ -63,7 +67,9 @@ function App() {
                         top: hoverInfo.y,
                     }}
                 >
-                    {JSON.stringify(hoverInfo.object.properties)}
+                    <pre>
+                        {JSON.stringify(hoverInfo.object.properties, null, 2)}
+                    </pre>
                 </div>
             )}
         </div>

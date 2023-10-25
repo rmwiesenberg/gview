@@ -120,16 +120,22 @@ export const LayerList = (
         const bounds = activeLayer.bounds
         if (bounds == null) return
 
-        const lngSpan = Math.abs(bounds[0][0] - bounds[1][0])
-        const latSpan = Math.abs(bounds[0][1] - bounds[1][1])
+        const lngZoom = 120 / Math.abs(bounds[0][0] - bounds[1][0])
+        const latZoom = 60 / Math.abs(bounds[0][1] - bounds[1][1])
 
         const lng = (bounds[0][0] + bounds[1][0]) / 2
         const lat = (bounds[0][1] + bounds[1][1]) / 2
+
+        const randomOffset = () => {
+            return (Math.random() - 0.5) * 1e-6
+        }
+
+        // Add small, random number to lng/lat so that zoom always works.
         setInitialViewState((viewState) => ({
             ...viewState,
-            zoom: 180 / Math.max(lngSpan, latSpan),
-            longitude: lng,
-            latitude: lat,
+            zoom: Math.min(lngZoom, latZoom),
+            longitude: lng + randomOffset(),
+            latitude: lat + randomOffset(),
             transitionDuration: 1000,
             transitionInterpolator: new FlyToInterpolator(),
         }))

@@ -123,6 +123,7 @@ const AddFileLayerForm = (submit: CloseFormCallback) => {
     return (
         <DropzoneArea
             acceptedFiles={['.gpkg', '.geojson']}
+            filesLimit={1000}
             maxFileSize={1024 * 10e6}
             dropzoneText={'Drag and drop an file here or click'}
             onChange={handleChange.bind(this)}
@@ -145,15 +146,15 @@ export const AddLayerDialog = (props: AddLayerProps) => {
                         onChange={(_, newValue) => setValue(newValue)}
                         aria-label="Add Layer Tabs"
                     >
-                        <Tab label="XYZ Tile Server" {...a11yProps(0)} />
-                        <Tab label="File Upload" {...a11yProps(1)} />
+                        <Tab label="File Upload" {...a11yProps(0)} />
+                        <Tab label="XYZ Tile Server" {...a11yProps(1)} />
                     </Tabs>
                 </Box>
                 <CustomTabPanel value={value} index={0}>
-                    {AddXYZTileLayer(onClose)}
+                    {AddFileLayerForm(onClose)}
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={1}>
-                    {AddFileLayerForm(onClose)}
+                    {AddXYZTileLayer(onClose)}
                 </CustomTabPanel>
             </Container>
         </Dialog>
