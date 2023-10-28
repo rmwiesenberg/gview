@@ -18,12 +18,12 @@ export const layersSlice = createSlice({
     name: 'layers',
     initialState,
     reducers: {
-        addLayers: (state, action: PayloadAction<GeoLayer[]>) => {
-            for (let newLayer of action.payload) {
-                state.layers[newLayer.id] = newLayer
-                state.ordered.push(newLayer)
-                state.isActive[newLayer.id] = true
-            }
+        addLayer: (state, action: PayloadAction<GeoLayer>) => {
+            const newLayer = action.payload
+
+            state.layers[newLayer.id] = newLayer
+            state.ordered.push(newLayer)
+            state.isActive[newLayer.id] = true
 
             return state
         },
@@ -48,6 +48,6 @@ export const layersSlice = createSlice({
     },
 })
 
-export const { addLayers, removeLayer, toggleActive } = layersSlice.actions
+export const { addLayer, removeLayer, toggleActive } = layersSlice.actions
 
 export default layersSlice.reducer

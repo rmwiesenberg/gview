@@ -23,7 +23,7 @@ import { AddLayerDialog } from './AddLayerDialog'
 import { MoreVert } from '@mui/icons-material'
 import { LayerMenu } from './LayerMenu'
 import { useAppDispatch, useAppSelector } from '../app/hook'
-import { addLayers, toggleActive } from '../features/layersSlice'
+import { toggleActive } from '../features/layersSlice'
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean
@@ -91,12 +91,6 @@ export const LayerList = () => {
     const [activeLayer, setActiveLayer] = React.useState<null | GeoLayer>(null)
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
 
-    const handleCloseAddLayer = (newLayers?: GeoLayer[]) => {
-        setIsAddLayerActive(false)
-        if (newLayers == null) return
-        dispatch(addLayers(newLayers))
-    }
-
     const handleExpandClick = () => {
         setExpanded(!expanded)
     }
@@ -159,7 +153,7 @@ export const LayerList = () => {
             </Card>
             {AddLayerDialog({
                 open: isAddLayerActive,
-                onClose: handleCloseAddLayer,
+                onClose: () => setIsAddLayerActive(false),
             })}
             {LayerMenu(activeLayer, anchorEl, handleCloseLayerMenu)}
         </div>

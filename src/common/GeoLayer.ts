@@ -104,9 +104,7 @@ export class FeaturesGeoLayer implements GeoLayer {
     }
 }
 
-export const geoLayerFromFile = async (
-    file: File
-): Promise<GeoLayer[] | null> => {
+export async function* geoLayerFromFile(file: File): AsyncIterable<GeoLayer> {
     const options = {
         geopackage: {
             sqlJsCDN: 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/',
@@ -121,29 +119,22 @@ export const geoLayerFromFile = async (
     let ext = file.name.toLowerCase().split('.').pop()
     console.log(`Loading ${ext} file`)
 
-    let layers: GeoLayer[] | null = null
     switch (ext) {
         case 'geojson':
             const geojson = await load(file, _GeoJSONLoader, options)
-            layers = [
-                new FeaturesGeoLayer({
-                    name: file.name,
-                    features: geojson.features,
-                }),
-            ]
+            yield new FeaturesGeoLayer({
+                name: file.name,
+                features: geojson.features,
+            })
             break
         case 'gpkg':
             const geopackage: any = await load(file, GeoPackageLoader, options)
-            layers = []
             for (let layerName in geopackage) {
-                layers.push(
-                    new FeaturesGeoLayer({
-                        name: `${file.name}-${layerName}`,
-                        features: geopackage[layerName],
-                    })
-                )
+                yield new FeaturesGeoLayer({
+                    name: `${file.name}-${layerName}`,
+                    features: geopackage[layerName],
+                })
             }
             break
     }
-    return layers
 }
