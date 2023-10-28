@@ -4,12 +4,12 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { GeoLayer } from '../common/GeoLayer'
 import { useAppDispatch } from '../app/hook'
 import { removeLayer } from '../features/layersSlice'
+import { focusLayer } from '../features/viewSlice'
 
 export const LayerMenu = (
     layer: null | GeoLayer,
     anchorEl: null | HTMLElement,
-    handleClose: () => void,
-    handleFocus: () => void
+    handleClose: () => void
 ) => {
     const dispatch = useAppDispatch()
     const open = Boolean(anchorEl)
@@ -54,7 +54,7 @@ export const LayerMenu = (
             {layer?.bounds != null && (
                 <MenuItem
                     onClick={() => {
-                        handleFocus()
+                        if (layer != null) dispatch(focusLayer(layer))
                         handleClose()
                     }}
                 >

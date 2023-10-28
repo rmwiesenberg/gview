@@ -20,10 +20,8 @@ import React from 'react'
 import { GeoLayer } from '../common/GeoLayer'
 import { styled } from '@mui/material/styles'
 import { AddLayerDialog } from './AddLayerDialog'
-import { ViewState } from '../common/ViewState'
 import { MoreVert } from '@mui/icons-material'
 import { LayerMenu } from './LayerMenu'
-import { FlyToInterpolator } from '@deck.gl/core/typed'
 import { useAppDispatch, useAppSelector } from '../app/hook'
 import { addLayers, toggleActive } from '../features/layersSlice'
 
@@ -84,19 +82,17 @@ const LayerItem = (
     )
 }
 
-export const LayerList = (
-    setInitialViewState: React.Dispatch<React.SetStateAction<ViewState>>
-) => {
+export const LayerList = () => {
     const layersState = useAppSelector((state) => state.layers)
     const dispatch = useAppDispatch()
 
     const [expanded, setExpanded] = React.useState(true)
-    const [addLayer, setAddLayer] = React.useState(false)
+    const [isAddLayerActive, setIsAddLayerActive] = React.useState(false)
     const [activeLayer, setActiveLayer] = React.useState<null | GeoLayer>(null)
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
 
     const handleCloseAddLayer = (newLayers?: GeoLayer[]) => {
-        setAddLayer(false)
+        setIsAddLayerActive(false)
         if (newLayers == null) return
         dispatch(addLayers(newLayers))
     }
@@ -108,33 +104,6 @@ export const LayerList = (
     const handleCloseLayerMenu = () => {
         setAnchorEl(null)
         setActiveLayer(null)
-    }
-
-    const focusActiveLayer = () => {
-        if (activeLayer == null) return
-        console.log(`Focusing on ${activeLayer}`)
-        const bounds = activeLayer.bounds
-        if (bounds == null) return
-
-        const lngZoom = 120 / Math.abs(bounds[0][0] - bounds[1][0])
-        const latZoom = 60 / Math.abs(bounds[0][1] - bounds[1][1])
-
-        const lng = (bounds[0][0] + bounds[1][0]) / 2
-        const lat = (bounds[0][1] + bounds[1][1]) / 2
-
-        const randomOffset = () => {
-            return (Math.random() - 0.5) * 1e-6
-        }
-
-        // Add small, random number to lng/lat so that zoom always works.
-        setInitialViewState((viewState) => ({
-            ...viewState,
-            zoom: Math.min(lngZoom, latZoom),
-            longitude: lng + randomOffset(),
-            latitude: lat + randomOffset(),
-            transitionDuration: 1000,
-            transitionInterpolator: new FlyToInterpolator(),
-        }))
     }
 
     const getLayerItems = () => {
@@ -162,7 +131,7 @@ export const LayerList = (
                     action={
                         <IconButton
                             aria-label="add layer"
-                            onClick={() => setAddLayer(true)}
+                            onClick={() => setIsAddLayerActive(true)}
                         >
                             <AddIcon />
                         </IconButton>
@@ -189,15 +158,10 @@ export const LayerList = (
                 </Collapse>
             </Card>
             {AddLayerDialog({
-                open: addLayer,
+                open: isAddLayerActive,
                 onClose: handleCloseAddLayer,
             })}
-            {LayerMenu(
-                activeLayer,
-                anchorEl,
-                handleCloseLayerMenu,
-                focusActiveLayer
-            )}
+            {LayerMenu(activeLayer, anchorEl, handleCloseLayerMenu)}
         </div>
     )
 }

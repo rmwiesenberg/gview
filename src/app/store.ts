@@ -6,9 +6,11 @@ import {
 } from '@reduxjs/toolkit'
 
 import layersReducer from '../features/layersSlice'
+import viewReducer from '../features/viewSlice'
 
 const reducers = combineReducers({
     layers: layersReducer,
+    view: viewReducer,
 })
 
 export const store = configureStore({
