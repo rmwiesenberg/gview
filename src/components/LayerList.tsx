@@ -16,14 +16,14 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import React, { Dispatch, SetStateAction } from 'react'
-import { GeoLayer } from '../core/GeoLayer'
+import React from 'react'
+import { GeoLayer } from '../common/GeoLayer'
 import { styled } from '@mui/material/styles'
 import { AddLayerDialog } from './AddLayerDialog'
-import { ViewState } from '../core/ViewState'
 import { MoreVert } from '@mui/icons-material'
 import { LayerMenu } from './LayerMenu'
-import { FlyToInterpolator } from '@deck.gl/core/typed'
+import { useAppDispatch, useAppSelector } from '../app/hook'
+import { toggleActive } from '../features/layersSlice'
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean
@@ -42,6 +42,7 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 
 const LayerItem = (
     layer: GeoLayer,
+    isActive: boolean,
     handleClick: (event: React.MouseEvent<HTMLElement>) => void,
     handleToggle: () => void
 ) => {
@@ -68,7 +69,7 @@ const LayerItem = (
                 <ListItemIcon>
                     <Checkbox
                         edge="start"
-                        checked={layer.active}
+                        checked={isActive}
                         onChange={() => handleToggle()}
                         tabIndex={-1}
                         disableRipple
@@ -81,21 +82,14 @@ const LayerItem = (
     )
 }
 
-export const LayerList = (
-    layers: GeoLayer[],
-    setLayers: Dispatch<SetStateAction<GeoLayer[]>>,
-    setInitialViewState: React.Dispatch<React.SetStateAction<ViewState>>
-) => {
+export const LayerList = () => {
+    const layersState = useAppSelector((state) => state.layers)
+    const dispatch = useAppDispatch()
+
     const [expanded, setExpanded] = React.useState(true)
-    const [addLayer, setAddLayer] = React.useState(false)
+    const [isAddLayerActive, setIsAddLayerActive] = React.useState(false)
     const [activeLayer, setActiveLayer] = React.useState<null | GeoLayer>(null)
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-
-    const handleCloseAddLayer = (newLayers?: GeoLayer[]) => {
-        setAddLayer(false)
-        if (newLayers == null) return
-        setLayers([...newLayers, ...layers])
-    }
 
     const handleExpandClick = () => {
         setExpanded(!expanded)
@@ -106,62 +100,18 @@ export const LayerList = (
         setActiveLayer(null)
     }
 
-    const handleToggle = (layer: GeoLayer) => {
-        layer.active = !layer.active
-        console.log(`Toggle layer active ${layer}`)
-        const i = layers.indexOf(layer)
-        setLayers([...layers.slice(0, i), layer, ...layers.slice(i + 1)])
-    }
-
-    const focusActiveLayer = () => {
-        if (activeLayer == null) return
-        if (!activeLayer.active) return
-        console.log(`Focusing on ${activeLayer}`)
-        const bounds = activeLayer.bounds
-        if (bounds == null) return
-
-        const lngZoom = 120 / Math.abs(bounds[0][0] - bounds[1][0])
-        const latZoom = 60 / Math.abs(bounds[0][1] - bounds[1][1])
-
-        const lng = (bounds[0][0] + bounds[1][0]) / 2
-        const lat = (bounds[0][1] + bounds[1][1]) / 2
-
-        const randomOffset = () => {
-            return (Math.random() - 0.5) * 1e-6
-        }
-
-        // Add small, random number to lng/lat so that zoom always works.
-        setInitialViewState((viewState) => ({
-            ...viewState,
-            zoom: Math.min(lngZoom, latZoom),
-            longitude: lng + randomOffset(),
-            latitude: lat + randomOffset(),
-            transitionDuration: 1000,
-            transitionInterpolator: new FlyToInterpolator(),
-        }))
-    }
-
-    const deleteActiveLayer = () => {
-        if (activeLayer == null) return
-        activeLayer.active = !activeLayer.active
-        console.log(`Remove layer ${activeLayer}`)
-        const i = layers.indexOf(activeLayer)
-        setLayers([...layers.slice(0, i), ...layers.slice(i + 1)])
-    }
-
     const getLayerItems = () => {
         const listItems = []
-        for (let i = 0; i < layers.length; i++) {
-            const layer = layers[i]
-
+        for (let layer of layersState.ordered) {
             listItems.push(
                 LayerItem(
                     layer,
+                    layersState.isActive[layer.id]!,
                     (event: React.MouseEvent<HTMLElement>) => {
                         setAnchorEl(event.currentTarget)
                         setActiveLayer(layer)
                     },
-                    () => handleToggle(layer)
+                    () => dispatch(toggleActive(layer))
                 )
             )
         }
@@ -175,7 +125,7 @@ export const LayerList = (
                     action={
                         <IconButton
                             aria-label="add layer"
-                            onClick={() => setAddLayer(true)}
+                            onClick={() => setIsAddLayerActive(true)}
                         >
                             <AddIcon />
                         </IconButton>
@@ -183,7 +133,9 @@ export const LayerList = (
                     title="Layers"
                 />
                 <CardActions disableSpacing>
-                    <Box sx={{ ml: 2 }}>{layers.length} layer(s)</Box>
+                    <Box sx={{ ml: 2 }}>
+                        {layersState.ordered.length} layer(s)
+                    </Box>
                     <ExpandMore
                         expand={expanded}
                         onClick={handleExpandClick}
@@ -200,16 +152,10 @@ export const LayerList = (
                 </Collapse>
             </Card>
             {AddLayerDialog({
-                open: addLayer,
-                onClose: handleCloseAddLayer,
+                open: isAddLayerActive,
+                onClose: () => setIsAddLayerActive(false),
             })}
-            {LayerMenu(
-                activeLayer,
-                anchorEl,
-                handleCloseLayerMenu,
-                focusActiveLayer,
-                deleteActiveLayer
-            )}
+            {LayerMenu(activeLayer, anchorEl, handleCloseLayerMenu)}
         </div>
     )
 }

@@ -1,34 +1,19 @@
 import DeckGL from '@deck.gl/react/typed'
-import { ViewState } from './core/ViewState'
 import { Box, Link, Paper } from '@mui/material'
 import React from 'react'
-import { GeoLayer } from './core/GeoLayer'
 import { LayerList } from './components/LayerList'
-
-const INITIAL_VIEW_STATE: ViewState = {
-    longitude: -83.0,
-    latitude: 42.33,
-    zoom: 11,
-    pitch: 30,
-    maxPitch: 89.9,
-}
-
-const initialLayers: GeoLayer[] = []
+import { useAppSelector } from './app/hook'
 
 function App() {
-    const [initialViewState, setInitialViewState] =
-        React.useState(INITIAL_VIEW_STATE)
-    const [layers, setLayers] = React.useState(initialLayers)
     const [hoverInfo, setHoverInfo] = React.useState<any>({})
 
-    let activeLayers = []
-    for (const layer of layers) {
-        if (layer.active) activeLayers.push(layer)
-    }
+    const layersState = useAppSelector((state) => state.layers)
+    const viewState = useAppSelector((state) => state.view)
 
-    console.log(
-        `Using initial view state of ${JSON.stringify(initialViewState)}`
-    )
+    let activeLayers = []
+    for (const layer of layersState.ordered) {
+        if (layersState.isActive[layer.id]) activeLayers.push(layer)
+    }
 
     return (
         <div>
@@ -37,7 +22,7 @@ function App() {
                 sx={{ minWidth: 150, maxWidth: 300 }}
                 style={{ position: 'relative', zIndex: '1' }}
             >
-                {LayerList(layers, setLayers, setInitialViewState)}
+                {LayerList()}
             </Box>
             <Box mt={3} zIndex="2" position="absolute" bottom="0px">
                 <Paper>
@@ -53,7 +38,7 @@ function App() {
                 </Paper>
             </Box>
             <DeckGL
-                initialViewState={initialViewState}
+                initialViewState={viewState.lastSet}
                 viewState={false}
                 layers={activeLayers
                     .map((l) => l.makeLayer(setHoverInfo))

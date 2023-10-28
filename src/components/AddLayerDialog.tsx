@@ -1,4 +1,4 @@
-import { GeoLayer, geoLayerFromFile, TileGeoLayer } from '../core/GeoLayer'
+import { geoLayerFromFile, TileGeoLayer } from '../common/GeoLayer'
 import {
     Box,
     Button,
@@ -11,8 +11,10 @@ import {
 import { FormContainer, TextFieldElement } from 'react-hook-form-mui'
 import React from 'react'
 import { DropzoneArea } from 'react-mui-dropzone'
+import { useAppDispatch } from '../app/hook'
+import { addLayer } from '../features/layersSlice'
 
-type CloseFormCallback = (newLayers?: GeoLayer[]) => void
+type CloseFormCallback = () => void
 
 export interface AddLayerProps {
     open: boolean
@@ -50,7 +52,9 @@ function a11yProps(index: number) {
     }
 }
 
-const AddXYZTileLayer = (submit: CloseFormCallback) => {
+const AddXYZTileLayer = (cb: CloseFormCallback) => {
+    const dispatch = useAppDispatch()
+
     return (
         <FormContainer
             defaultValues={{
@@ -59,17 +63,19 @@ const AddXYZTileLayer = (submit: CloseFormCallback) => {
                 minZoom: 0,
                 maxZoom: 19,
             }}
-            onSuccess={(data) =>
-                submit([
-                    new TileGeoLayer({
-                        name: data.name,
-                        active: true,
-                        url: data.url,
-                        minZoom: data.minZoom,
-                        maxZoom: data.maxZoom,
-                    }),
-                ])
-            }
+            onSuccess={(data) => {
+                cb()
+                dispatch(
+                    addLayer(
+                        new TileGeoLayer({
+                            name: data.name,
+                            url: data.url,
+                            minZoom: data.minZoom,
+                            maxZoom: data.maxZoom,
+                        })
+                    )
+                )
+            }}
         >
             <TextFieldElement
                 fullWidth={true}
@@ -110,15 +116,17 @@ const AddXYZTileLayer = (submit: CloseFormCallback) => {
     )
 }
 
-const AddFileLayerForm = (submit: CloseFormCallback) => {
+const AddFileLayerForm = (cb: CloseFormCallback) => {
+    const dispatch = useAppDispatch()
+
     const handleChange = async (files: File[]) => {
         if (files.length === 0) return
-        let newLayers: GeoLayer[] = []
+        cb()
         for (const file of files) {
-            const layersFromFile = await geoLayerFromFile(file)
-            if (layersFromFile != null) newLayers.push(...layersFromFile)
+            for await (let newLayer of geoLayerFromFile(file)) {
+                dispatch(addLayer(newLayer))
+            }
         }
-        submit(newLayers)
     }
 
     return (
