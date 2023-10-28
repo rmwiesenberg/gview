@@ -22,7 +22,7 @@ export const layersSlice = createSlice({
             const newLayer = action.payload
 
             state.layers[newLayer.id] = newLayer
-            state.ordered.push(newLayer)
+            state.ordered = [newLayer, ...state.ordered]
             state.isActive[newLayer.id] = true
 
             return state
