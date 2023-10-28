@@ -1,9 +1,10 @@
 import DeckGL from '@deck.gl/react/typed'
-import { ViewState } from './core/ViewState'
+import { ViewState } from './common/ViewState'
 import { Box, Link, Paper } from '@mui/material'
 import React from 'react'
-import { GeoLayer } from './core/GeoLayer'
+import { GeoLayer } from './common/GeoLayer'
 import { LayerList } from './components/LayerList'
+import { useAppSelector } from './app/hook'
 
 const INITIAL_VIEW_STATE: ViewState = {
     longitude: -83.0,
@@ -18,12 +19,13 @@ const initialLayers: GeoLayer[] = []
 function App() {
     const [initialViewState, setInitialViewState] =
         React.useState(INITIAL_VIEW_STATE)
-    const [layers, setLayers] = React.useState(initialLayers)
     const [hoverInfo, setHoverInfo] = React.useState<any>({})
 
+    const layersState = useAppSelector((state) => state.layers)
+
     let activeLayers = []
-    for (const layer of layers) {
-        if (layer.active) activeLayers.push(layer)
+    for (const layer of layersState.ordered) {
+        if (layersState.isActive[layer.id]) activeLayers.push(layer)
     }
 
     console.log(
@@ -37,7 +39,7 @@ function App() {
                 sx={{ minWidth: 150, maxWidth: 300 }}
                 style={{ position: 'relative', zIndex: '1' }}
             >
-                {LayerList(layers, setLayers, setInitialViewState)}
+                {LayerList(setInitialViewState)}
             </Box>
             <Box mt={3} zIndex="2" position="absolute" bottom="0px">
                 <Paper>

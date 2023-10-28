@@ -1,15 +1,17 @@
 import { ListItemIcon, Menu, MenuItem } from '@mui/material'
 import { GpsFixed } from '@mui/icons-material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { GeoLayer } from '../core/GeoLayer'
+import { GeoLayer } from '../common/GeoLayer'
+import { useAppDispatch } from '../app/hook'
+import { removeLayer } from '../features/layersSlice'
 
 export const LayerMenu = (
     layer: null | GeoLayer,
     anchorEl: null | HTMLElement,
     handleClose: () => void,
-    handleFocus: () => void,
-    handleDelete: () => void
+    handleFocus: () => void
 ) => {
+    const dispatch = useAppDispatch()
     const open = Boolean(anchorEl)
     return (
         <Menu
@@ -64,7 +66,7 @@ export const LayerMenu = (
             )}
             <MenuItem
                 onClick={() => {
-                    handleDelete()
+                    if (layer != null) dispatch(removeLayer(layer))
                     handleClose()
                 }}
             >

@@ -6,39 +6,38 @@ import { _GeoJSONLoader } from '@loaders.gl/json'
 import { GeoPackageLoader } from '@loaders.gl/geopackage'
 import bbox from '@turf/bbox'
 import { featureCollection } from '@turf/helpers'
+import { v4 as uuidv4 } from 'uuid'
 
 type SetHoverInfoCallback = (info: any) => void
 
 export interface GeoLayer {
+    id: string
     name: string
-    active: boolean
     bounds: [number[], number[]] | null
 
     makeLayer: (setHoverInfo: SetHoverInfoCallback) => TileLayer | GeoJsonLayer
 }
 
 export class TileGeoLayer implements GeoLayer {
+    id: string
     name: string
-    active: boolean
     url: string
     minZoom: number
     maxZoom: number
     bounds = null
     constructor({
         name,
-        active,
         url,
         minZoom,
         maxZoom,
     }: {
         name: string
-        active: boolean
         url: string
         minZoom: number
         maxZoom: number
     }) {
+        this.id = uuidv4()
         this.name = name
-        this.active = active
         this.url = url
         this.minZoom = minZoom
         this.maxZoom = maxZoom
@@ -67,22 +66,14 @@ export class TileGeoLayer implements GeoLayer {
 }
 
 export class FeaturesGeoLayer implements GeoLayer {
+    id: string
     name: string
-    active: boolean
     features: Feature[]
     bounds: [number[], number[]] | null = null
 
-    constructor({
-        name,
-        active,
-        features,
-    }: {
-        name: string
-        active: boolean
-        features: Feature[]
-    }) {
+    constructor({ name, features }: { name: string; features: Feature[] }) {
+        this.id = uuidv4()
         this.name = name
-        this.active = active
         this.features = features
 
         const layerBBox = bbox(featureCollection(this.features))
@@ -137,7 +128,6 @@ export const geoLayerFromFile = async (
             layers = [
                 new FeaturesGeoLayer({
                     name: file.name,
-                    active: true,
                     features: geojson.features,
                 }),
             ]
@@ -149,7 +139,6 @@ export const geoLayerFromFile = async (
                 layers.push(
                     new FeaturesGeoLayer({
                         name: `${file.name}-${layerName}`,
-                        active: true,
                         features: geopackage[layerName],
                     })
                 )

@@ -1,4 +1,4 @@
-import { GeoLayer, geoLayerFromFile, TileGeoLayer } from '../core/GeoLayer'
+import { GeoLayer, geoLayerFromFile, TileGeoLayer } from '../common/GeoLayer'
 import {
     Box,
     Button,
@@ -50,7 +50,7 @@ function a11yProps(index: number) {
     }
 }
 
-const AddXYZTileLayer = (submit: CloseFormCallback) => {
+const AddXYZTileLayer = (cb: CloseFormCallback) => {
     return (
         <FormContainer
             defaultValues={{
@@ -60,10 +60,9 @@ const AddXYZTileLayer = (submit: CloseFormCallback) => {
                 maxZoom: 19,
             }}
             onSuccess={(data) =>
-                submit([
+                cb([
                     new TileGeoLayer({
                         name: data.name,
-                        active: true,
                         url: data.url,
                         minZoom: data.minZoom,
                         maxZoom: data.maxZoom,
@@ -110,7 +109,7 @@ const AddXYZTileLayer = (submit: CloseFormCallback) => {
     )
 }
 
-const AddFileLayerForm = (submit: CloseFormCallback) => {
+const AddFileLayerForm = (cb: CloseFormCallback) => {
     const handleChange = async (files: File[]) => {
         if (files.length === 0) return
         let newLayers: GeoLayer[] = []
@@ -118,7 +117,7 @@ const AddFileLayerForm = (submit: CloseFormCallback) => {
             const layersFromFile = await geoLayerFromFile(file)
             if (layersFromFile != null) newLayers.push(...layersFromFile)
         }
-        submit(newLayers)
+        cb(newLayers)
     }
 
     return (
