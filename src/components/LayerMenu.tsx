@@ -1,5 +1,5 @@
 import { ListItemIcon, Menu, MenuItem } from '@mui/material'
-import { GpsFixed } from '@mui/icons-material'
+import { FormatPaint, GpsFixed } from '@mui/icons-material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { GeoLayer } from '../common/GeoLayer'
 import { useAppDispatch } from '../app/hook'
@@ -64,6 +64,16 @@ export const LayerMenu = (
                     Focus on layer
                 </MenuItem>
             )}
+            <MenuItem
+                onClick={() => {
+                    handleClose()
+                }}
+            >
+                <ListItemIcon>
+                    <FormatPaint fontSize="small" />
+                </ListItemIcon>
+                Edit style
+            </MenuItem>
             <MenuItem
                 onClick={() => {
                     if (layer != null) dispatch(removeLayer(layer))
