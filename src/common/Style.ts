@@ -37,7 +37,7 @@ class FieldGet<T> {
 
 type Color = [number, number, number] | [number, number, number, number]
 const randomColor = (): Color => {
-    return [255, 255, 255]
+    return [0, 0, 0]
 }
 
 type ColorFunction = (feature: Feature) => Color
@@ -94,13 +94,15 @@ export interface FeaturesStyle extends Style {
     strokeWidthScale: number
 }
 
-export const DEFAULT_STYLE: Style = { opacity: 0.8 }
+export const getDefaultStyle = (): Style => {
+    return { opacity: 0.8 }
+}
 export const getNewFeatureStyle = (): FeaturesStyle => {
     return {
-        ...DEFAULT_STYLE,
+        ...getDefaultStyle(),
         getFillColor: new RawGetColor(randomColor()),
         getStrokeColor: new RawGetColor(randomColor()),
-        getStrokeWidth: new RawGetNumber(0.8),
+        getStrokeWidth: new RawGetNumber(1),
         strokeWidthUnits: 'pixels',
         strokeWidthScale: 1,
     }

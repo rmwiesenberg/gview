@@ -8,20 +8,31 @@ import bbox from '@turf/bbox'
 import { featureCollection } from '@turf/helpers'
 import { v4 as uuidv4 } from 'uuid'
 import { Bounds } from './mapInfo'
+import { FeaturesStyle, Style } from './Style'
 
 type SetHoverInfoCallback = (info: any) => void
+type LayerType = 'base' | 'feature'
 
-export interface GeoLayer {
+export abstract class GeoLayer {
     id: string
+    type: LayerType = 'base'
     name: string
-    bounds: Bounds | null
+    bounds: Bounds | null = null
 
-    makeLayer: (setHoverInfo: SetHoverInfoCallback) => TileLayer | GeoJsonLayer
+    protected constructor(name: string) {
+        this.id = uuidv4()
+        this.name = name
+    }
+
+    makeLayer(
+        style: Style,
+        setHoverInfo: SetHoverInfoCallback
+    ): TileLayer | GeoJsonLayer {
+        throw Error()
+    }
 }
 
-export class TileGeoLayer implements GeoLayer {
-    id: string
-    name: string
+export class TileGeoLayer extends GeoLayer {
     url: string
     minZoom: number
     maxZoom: number
@@ -37,18 +48,19 @@ export class TileGeoLayer implements GeoLayer {
         minZoom: number
         maxZoom: number
     }) {
-        this.id = uuidv4()
-        this.name = name
+        super(name)
         this.url = url
         this.minZoom = minZoom
         this.maxZoom = maxZoom
     }
 
-    makeLayer(): TileLayer {
+    makeLayer(style: Style): TileLayer {
         return new TileLayer({
             data: this.url,
             minZoom: this.minZoom,
             maxZoom: this.maxZoom,
+
+            ...style,
 
             renderSubLayers: (props) => {
                 const {
@@ -66,27 +78,41 @@ export class TileGeoLayer implements GeoLayer {
     }
 }
 
-export class FeaturesGeoLayer implements GeoLayer {
-    id: string
-    name: string
+export class FeaturesGeoLayer extends GeoLayer {
+    type: LayerType = 'feature'
     features: Feature[]
     bounds: Bounds | null = null
 
     constructor({ name, features }: { name: string; features: Feature[] }) {
-        this.id = uuidv4()
-        this.name = name
-        this.features = features
+        super(name)
 
+        this.features = features
         const layerBBox = bbox(featureCollection(this.features))
         this.bounds = new Bounds(
             { lng: layerBBox[0], lat: layerBBox[1] },
             { lng: layerBBox[2], lat: layerBBox[3] }
         )
 
-        console.log(`New layer ${this.name} with bounds ${this.bounds}`)
+        console.log(
+            `New layer ${this.name} with bounds ${JSON.stringify(this.bounds)}`
+        )
     }
 
-    makeLayer(setHoverInfo: SetHoverInfoCallback): GeoJsonLayer {
+    makeLayer(
+        style: FeaturesStyle,
+        setHoverInfo: SetHoverInfoCallback
+    ): GeoJsonLayer {
+        const inferredStyle = {
+            opacity: style.opacity,
+            getFillColor: style.getFillColor.getColor,
+            getLineColor: style.getStrokeColor.getColor,
+            getLineWidth: style.getStrokeWidth.getNumber,
+            lineWidthUnits: style.strokeWidthUnits,
+            lineWidthScale: style.strokeWidthScale,
+        }
+
+        console.log(inferredStyle)
+
         return new GeoJsonLayer({
             data: this.features,
             pickable: true,
@@ -95,7 +121,7 @@ export class FeaturesGeoLayer implements GeoLayer {
             pointType: 'circle',
             lineWidthMinPixels: 1,
             pointRadiusMinPixels: 1,
-            opacity: 0.8,
+            ...inferredStyle,
             getPosition: (d: any) => d.position,
             onHover: (info) => {
                 console.log(info)
