@@ -7,13 +7,14 @@ import { GeoPackageLoader } from '@loaders.gl/geopackage'
 import bbox from '@turf/bbox'
 import { featureCollection } from '@turf/helpers'
 import { v4 as uuidv4 } from 'uuid'
+import { Bounds } from './mapInfo'
 
 type SetHoverInfoCallback = (info: any) => void
 
 export interface GeoLayer {
     id: string
     name: string
-    bounds: [number[], number[]] | null
+    bounds: Bounds | null
 
     makeLayer: (setHoverInfo: SetHoverInfoCallback) => TileLayer | GeoJsonLayer
 }
@@ -69,7 +70,7 @@ export class FeaturesGeoLayer implements GeoLayer {
     id: string
     name: string
     features: Feature[]
-    bounds: [number[], number[]] | null = null
+    bounds: Bounds | null = null
 
     constructor({ name, features }: { name: string; features: Feature[] }) {
         this.id = uuidv4()
@@ -77,10 +78,10 @@ export class FeaturesGeoLayer implements GeoLayer {
         this.features = features
 
         const layerBBox = bbox(featureCollection(this.features))
-        this.bounds = [
-            [layerBBox[0], layerBBox[1]],
-            [layerBBox[2], layerBBox[3]],
-        ]
+        this.bounds = new Bounds(
+            { lng: layerBBox[0], lat: layerBBox[1] },
+            { lng: layerBBox[2], lat: layerBBox[3] }
+        )
 
         console.log(`New layer ${this.name} with bounds ${this.bounds}`)
     }
