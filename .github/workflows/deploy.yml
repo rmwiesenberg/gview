@@ -1,0 +1,30 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install # will run `yarn install` command
+      - name: Predeploy
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: predeploy # will run `yarn build:prod` command
+      - name: Deploy
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: deploy # will run `yarn build:prod` command
