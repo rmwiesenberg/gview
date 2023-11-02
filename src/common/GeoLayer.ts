@@ -59,8 +59,7 @@ export class TileGeoLayer extends GeoLayer {
             data: this.url,
             minZoom: this.minZoom,
             maxZoom: this.maxZoom,
-
-            ...style,
+            opacity: style.opacity,
 
             renderSubLayers: (props) => {
                 const {

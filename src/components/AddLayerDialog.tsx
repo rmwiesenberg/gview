@@ -57,7 +57,7 @@ function a11yProps(index: number) {
 
 const XYZTileLayerSchema = Yup.object().shape({
     name: Yup.string().min(1, 'Too Short').required('Required'),
-    url: Yup.string().url('Invalid URL').required('Required'),
+    url: Yup.string().required('Required'),
     minZoom: Yup.number()
         .integer('Must be an integer')
         .min(0, 'Zoom cannot be less than 0'),
