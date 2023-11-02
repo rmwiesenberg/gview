@@ -53,7 +53,7 @@ const SetColorField = (styleColor: GetColor, onChange: ColorCallback) => {
 
 export const EditStyleDialog = (props: EditStyleProps) => {
     const { layer, style, open, onClose } = props
-    const [getFillColor, setGetFillColor] = React.useState(style?.getFillColor)
+    const [getColor, setGetColor] = React.useState(style?.getFillColor)
 
     const dispatch = useAppDispatch()
 
@@ -73,7 +73,8 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                         const newStyle = {
                             ...style,
                             opacity: style.opacity / 100,
-                            getFillColor: getFillColor,
+                            getFillColor: getColor,
+                            getStrokeColor: getColor,
                         }
                         console.log(`Updating style: ${newStyle}`)
                         dispatch(setStyle([layer, newStyle]))
@@ -81,7 +82,7 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                 >
                     {style?.getFillColor &&
                         SetColorField(style.getFillColor, (c) =>
-                            setGetFillColor(c)
+                            setGetColor(c)
                         )}
                     {spacer()}
                     <SliderElement
