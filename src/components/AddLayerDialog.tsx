@@ -5,14 +5,17 @@ import {
     Container,
     Dialog,
     DialogTitle,
+    Grid,
     Tab,
     Tabs,
 } from '@mui/material'
-import { FormContainer, TextFieldElement } from 'react-hook-form-mui'
 import React from 'react'
 import { DropzoneArea } from 'react-mui-dropzone'
 import { useAppDispatch } from '../app/hook'
 import { addLayer } from '../features/layersSlice'
+import { Field, Form, Formik } from 'formik'
+import { TextField } from 'formik-mui'
+import * as Yup from 'yup'
 
 type CloseFormCallback = () => void
 
@@ -52,67 +55,77 @@ function a11yProps(index: number) {
     }
 }
 
+const XYZTileLayerSchema = Yup.object().shape({
+    name: Yup.string().min(1, 'Too Short').required('Required'),
+    url: Yup.string().url('Invalid URL').required('Required'),
+    minZoom: Yup.number()
+        .integer('Must be an integer')
+        .min(0, 'Zoom cannot be less than 0'),
+    maxZoom: Yup.number().integer('Must be an integer'),
+})
+
 const AddXYZTileLayer = (cb: CloseFormCallback) => {
     const dispatch = useAppDispatch()
 
     return (
-        <FormContainer
-            defaultValues={{
+        <Formik
+            initialValues={{
                 name: '',
                 url: '',
                 minZoom: 0,
                 maxZoom: 19,
             }}
-            onSuccess={(data) => {
+            validationSchema={XYZTileLayerSchema}
+            onSubmit={(values, actions) => {
                 cb()
-                dispatch(
-                    addLayer(
-                        new TileGeoLayer({
-                            name: data.name,
-                            url: data.url,
-                            minZoom: data.minZoom,
-                            maxZoom: data.maxZoom,
-                        })
-                    )
-                )
+                dispatch(addLayer(new TileGeoLayer(values)))
             }}
         >
-            <TextFieldElement
-                fullWidth={true}
-                name="name"
-                label="Name"
-                required
-            />
-            {spacer()}
-            <TextFieldElement
-                fullWidth={true}
-                name="url"
-                label="URL"
-                helperText="https://my.tileserver.com/{z}/{x}/{y}.png"
-                required
-            />
-            {spacer()}
-            <TextFieldElement
-                fullWidth={true}
-                name="minZoom"
-                type={'number'}
-                label="Min Zoom Level"
-                required
-            />
-            {spacer()}
-            <TextFieldElement
-                fullWidth={true}
-                name="maxZoom"
-                label="Max Zoom Level"
-                type={'number'}
-                required
-            />
-            {spacer()}
-            <Button type="submit" variant="contained" fullWidth={true}>
-                Submit
-            </Button>
-            {spacer()}
-        </FormContainer>
+            <Form>
+                <Field
+                    component={TextField}
+                    id="name"
+                    name="name"
+                    label="Name"
+                    fullWidth={true}
+                />
+                {spacer()}
+
+                <Field
+                    component={TextField}
+                    id="url"
+                    name="url"
+                    label="URL"
+                    fullWidth={true}
+                    helperText="https://my.tileserver.com/{z}/{x}/{y}.png"
+                />
+                {spacer()}
+
+                <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                        <Field
+                            component={TextField}
+                            id="minZoom"
+                            name="minZoom"
+                            label="Min Zoom"
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Field
+                            component={TextField}
+                            id="maxZoom"
+                            name="maxZoom"
+                            label="Max Zoom"
+                        />
+                    </Grid>
+                </Grid>
+                {spacer()}
+
+                <Button type="submit" variant="contained" fullWidth={true}>
+                    Submit
+                </Button>
+            </Form>
+        </Formik>
     )
 }
 
@@ -148,7 +161,7 @@ export const AddLayerDialog = (props: AddLayerProps) => {
     return (
         <Dialog onClose={() => onClose()} open={open}>
             <DialogTitle>Add Layer</DialogTitle>
-            <Container sx={{ minWidth: 480 }}>
+            <Container>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs
                         value={value}

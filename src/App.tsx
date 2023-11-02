@@ -41,7 +41,9 @@ function App() {
                 initialViewState={viewState.lastSet}
                 viewState={false}
                 layers={activeLayers
-                    .map((l) => l.makeLayer(setHoverInfo))
+                    .map((l) =>
+                        l.makeLayer(layersState.styles[l.id]!, setHoverInfo)
+                    )
                     .reverse()}
                 controller={true}
             />

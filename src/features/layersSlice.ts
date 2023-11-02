@@ -1,17 +1,25 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { createSlice, Dictionary } from '@reduxjs/toolkit'
 import { GeoLayer } from '../common/GeoLayer'
+import { getDefaultStyle, getNewFeatureStyle, Style } from '../common/Style'
 
 export interface LayersState {
     layers: Dictionary<GeoLayer>
     ordered: GeoLayer[]
     isActive: Dictionary<boolean>
+    styles: Dictionary<Style>
 }
 
 export const initialState: LayersState = {
     layers: {},
     ordered: [],
     isActive: {},
+    styles: {},
+}
+
+interface SetStyleParams {
+    layer: GeoLayer
+    style: Style
 }
 
 export const layersSlice = createSlice({
@@ -24,6 +32,10 @@ export const layersSlice = createSlice({
             state.layers[newLayer.id] = newLayer
             state.ordered = [newLayer, ...state.ordered]
             state.isActive[newLayer.id] = true
+            state.styles[newLayer.id] =
+                newLayer.type === 'feature'
+                    ? getNewFeatureStyle()
+                    : getDefaultStyle()
 
             return state
         },
@@ -37,6 +49,7 @@ export const layersSlice = createSlice({
                 ...state.ordered.slice(i + 1),
             ]
             delete state.isActive[removedLayer.id]
+            delete state.styles[removedLayer.id]
 
             return state
         },
@@ -45,9 +58,16 @@ export const layersSlice = createSlice({
                 !state.isActive[action.payload.id]
             return state
         },
+        setStyle: (state, action: PayloadAction<SetStyleParams>) => {
+            const { layer, style } = action.payload
+
+            state.styles[layer.id] = style
+            return
+        },
     },
 })
 
-export const { addLayer, removeLayer, toggleActive } = layersSlice.actions
+export const { addLayer, removeLayer, toggleActive, setStyle } =
+    layersSlice.actions
 
 export default layersSlice.reducer

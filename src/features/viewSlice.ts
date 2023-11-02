@@ -54,7 +54,7 @@ export const viewSlice = createSlice({
         focusLayer: (state, action: PayloadAction<GeoLayer>) => {
             const layer = action.payload
 
-            console.log(`Focusing on ${layer}`)
+            console.log(`Focusing on ${layer.name}`)
             const bounds = layer.bounds
             if (bounds == null) return state
 
