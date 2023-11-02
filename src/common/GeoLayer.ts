@@ -8,7 +8,7 @@ import bbox from '@turf/bbox'
 import { featureCollection } from '@turf/helpers'
 import { v4 as uuidv4 } from 'uuid'
 import { Bounds } from './mapInfo'
-import { FeaturesStyle, Style } from './Style'
+import { Style } from './Style'
 
 type SetHoverInfoCallback = (info: any) => void
 type LayerType = 'base' | 'feature'
@@ -98,15 +98,12 @@ export class FeaturesGeoLayer extends GeoLayer {
         )
     }
 
-    makeLayer(
-        style: FeaturesStyle,
-        setHoverInfo: SetHoverInfoCallback
-    ): GeoJsonLayer {
+    makeLayer(style: Style, setHoverInfo: SetHoverInfoCallback): GeoJsonLayer {
         const inferredStyle = {
             opacity: style.opacity,
-            getFillColor: style.getFillColor.getColor,
-            getLineColor: style.getStrokeColor.getColor,
-            getLineWidth: style.getStrokeWidth.getNumber,
+            getFillColor: style.getFillColor?.getColor,
+            getLineColor: style.getStrokeColor?.getColor,
+            getLineWidth: style.getStrokeWidth?.getNumber,
             lineWidthUnits: style.strokeWidthUnits,
             lineWidthScale: style.strokeWidthScale,
         }

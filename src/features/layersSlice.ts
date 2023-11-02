@@ -62,6 +62,7 @@ export const layersSlice = createSlice({
     },
 })
 
-export const { addLayer, removeLayer, toggleActive } = layersSlice.actions
+export const { addLayer, removeLayer, toggleActive, setStyle } =
+    layersSlice.actions
 
 export default layersSlice.reducer

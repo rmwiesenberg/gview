@@ -155,7 +155,12 @@ export const LayerList = () => {
                 open: isAddLayerActive,
                 onClose: () => setIsAddLayerActive(false),
             })}
-            {LayerMenu(activeLayer, anchorEl, handleCloseLayerMenu)}
+            {LayerMenu(
+                activeLayer,
+                activeLayer ? layersState.styles[activeLayer.id]! : null,
+                anchorEl,
+                handleCloseLayerMenu
+            )}
         </div>
     )
 }

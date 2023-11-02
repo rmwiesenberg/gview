@@ -1,10 +1,6 @@
 import { Feature } from 'geojson'
 import { Dictionary } from '@reduxjs/toolkit'
 
-export interface Style {
-    opacity: number
-}
-
 type GetterType = 'field' | 'raw'
 class FieldGet<T> {
     type: GetterType = 'field'
@@ -35,13 +31,13 @@ class FieldGet<T> {
     }
 }
 
-type Color = [number, number, number] | [number, number, number, number]
+export type Color = [number, number, number, number] | [number, number, number]
 const randomColor = (): Color => {
-    return [0, 0, 0]
+    return [0, 0, 0, 255]
 }
 
 type ColorFunction = (feature: Feature) => Color
-interface GetColor {
+export interface GetColor {
     type: GetterType
     getColor: ColorFunction | Color
 }
@@ -63,7 +59,7 @@ export class FieldGetColor extends FieldGet<Color> implements GetColor {
 }
 
 type NumberFunction = (feature: Feature) => number
-interface GetNumber {
+export interface GetNumber {
     type: GetterType
     getNumber: NumberFunction | number
 }
@@ -86,18 +82,19 @@ export class FieldGetNumber extends FieldGet<number> implements GetNumber {
 
 type WidthUnits = 'meters' | 'common' | 'pixels'
 
-export interface FeaturesStyle extends Style {
-    getFillColor: GetColor
-    getStrokeColor: GetColor
-    getStrokeWidth: GetNumber
-    strokeWidthUnits: WidthUnits
-    strokeWidthScale: number
+export interface Style {
+    opacity: number
+    getFillColor?: GetColor
+    getStrokeColor?: GetColor
+    getStrokeWidth?: GetNumber
+    strokeWidthUnits?: WidthUnits
+    strokeWidthScale?: number
 }
 
 export const getDefaultStyle = (): Style => {
     return { opacity: 0.8 }
 }
-export const getNewFeatureStyle = (): FeaturesStyle => {
+export const getNewFeatureStyle = (): Style => {
     return {
         ...getDefaultStyle(),
         getFillColor: new RawGetColor(randomColor()),
