@@ -108,8 +108,6 @@ export class FeaturesGeoLayer extends GeoLayer {
             lineWidthScale: style.strokeWidthScale,
         }
 
-        console.log(inferredStyle)
-
         return new GeoJsonLayer({
             data: this.features,
             pickable: true,

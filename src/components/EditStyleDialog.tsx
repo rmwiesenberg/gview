@@ -1,101 +1,140 @@
 import { GeoLayer } from '../common/GeoLayer'
 import { rgbaToHex } from '@uiw/color-convert'
-import { Box, Button, Container, Dialog, DialogTitle } from '@mui/material'
-import { FormContainer, SliderElement } from 'react-hook-form-mui'
+import {
+    Box,
+    Button,
+    Container,
+    Dialog,
+    DialogTitle,
+    Grid,
+    Slider,
+    Typography,
+} from '@mui/material'
 import React from 'react'
 import { useAppDispatch } from '../app/hook'
 import { setStyle } from '../features/layersSlice'
 import { GetColor, RawGetColor, Style } from '../common/Style'
 import Sketch from '@uiw/react-color-sketch'
+import { Field, FieldProps, Form, Formik } from 'formik'
+import * as Yup from 'yup'
 
 type CloseFormCallback = () => void
 
 export interface EditStyleProps {
     layer: GeoLayer | null
-    style: Style | null
+    initialStyle: Style | null
     open: boolean
     onClose: CloseFormCallback
 }
 
 const spacer = () => <Box sx={{ height: 16 }}></Box>
 
-type ColorCallback = (color: GetColor) => void
+const SetColorField: React.FC<
+    FieldProps<GetColor> & { prefix: React.ReactNode }
+> = ({ field, form: { setFieldValue } }) => {
+    if (typeof field.value.getColor == 'function') return <div></div>
 
-const SetColorField = (styleColor: GetColor, onChange: ColorCallback) => {
-    if (typeof styleColor.getColor == 'function') return <div></div>
-
-    const color = styleColor.getColor
+    const color = field.value.getColor
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
+        <Sketch
+            color={rgbaToHex({
+                r: color[0],
+                g: color[1],
+                b: color[2],
+                a: color[3] ?? 1,
+            })}
+            disableAlpha={true}
+            onChange={(color) => {
+                const rgba = color.rgba
+                setFieldValue(
+                    field.name,
+                    new RawGetColor([rgba.r, rgba.g, rgba.b, rgba.a])
+                )
             }}
-        >
-            <Sketch
-                color={rgbaToHex({
-                    r: color[0],
-                    g: color[1],
-                    b: color[2],
-                    a: color[3] ?? 1,
-                })}
-                disableAlpha={true}
-                onChange={(color) => {
-                    const rgb = color.rgb
-                    onChange(new RawGetColor([rgb.r, rgb.g, rgb.b]))
-                }}
-            />
-        </div>
+        />
     )
 }
 
+const StyleSchema = Yup.object().shape({
+    opacity: Yup.number().min(0).max(1),
+})
+
 export const EditStyleDialog = (props: EditStyleProps) => {
-    const { layer, style, open, onClose } = props
-    const [getColor, setGetColor] = React.useState(style?.getFillColor)
+    const { layer, initialStyle, open, onClose } = props
 
     const dispatch = useAppDispatch()
 
-    if (layer == null) return <div></div>
+    if (layer == null || initialStyle == null) return <div></div>
 
     return (
         <Dialog onClose={() => onClose()} open={open}>
             <DialogTitle>Edit Layer Style</DialogTitle>
-            <Container sx={{ minWidth: 480 }}>
-                <FormContainer
-                    defaultValues={{
-                        ...style,
-                        opacity: style!.opacity * 100,
-                    }}
-                    onSuccess={(style: Style) => {
+            <Container sx={{ width: 480 }}>
+                <Formik
+                    initialValues={initialStyle}
+                    validationSchema={StyleSchema}
+                    onSubmit={(newStyle) => {
                         onClose()
-                        const newStyle = {
-                            ...style,
-                            opacity: style.opacity / 100,
-                            getFillColor: getColor,
-                            getStrokeColor: getColor,
-                        }
-                        console.log(`Updating style: ${newStyle}`)
+                        console.log(
+                            `Updating style: ${JSON.stringify(newStyle)}`
+                        )
                         dispatch(setStyle([layer, newStyle]))
                     }}
                 >
-                    {style?.getFillColor &&
-                        SetColorField(style.getFillColor, (c) =>
-                            setGetColor(c)
-                        )}
-                    {spacer()}
-                    <SliderElement
-                        label="Opacity %"
-                        name="opacity"
-                        required
-                    ></SliderElement>
-                    {spacer()}
-                    <Button type="submit" variant="contained" fullWidth={true}>
-                        Apply
-                    </Button>
-                    {spacer()}
-                </FormContainer>
+                    {({ handleChange, values }) => (
+                        <Form>
+                            <Grid container spacing={2}>
+                                {values.getStrokeColor && (
+                                    <Grid item xs={6}>
+                                        <Typography>
+                                            Stroke/Outline Color
+                                        </Typography>
+                                        <Field
+                                            id="getStrokeColor"
+                                            name="getStrokeColor"
+                                            component={SetColorField}
+                                        />
+                                    </Grid>
+                                )}
+                                {values.getFillColor && (
+                                    <Grid item xs={6}>
+                                        <Typography>Fill Color</Typography>
+                                        <Field
+                                            id="getFillColor"
+                                            name="getFillColor"
+                                            component={SetColorField}
+                                        />
+                                    </Grid>
+                                )}
+                            </Grid>
+
+                            {spacer()}
+
+                            <Typography>Opacity</Typography>
+                            <Slider
+                                id="opacity"
+                                name="opacity"
+                                min={0}
+                                step={1e-2}
+                                max={1}
+                                defaultValue={values.opacity}
+                                valueLabelDisplay="auto"
+                                onChange={handleChange}
+                            />
+                            {spacer()}
+
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                fullWidth={true}
+                            >
+                                Apply
+                            </Button>
+                            {spacer()}
+                        </Form>
+                    )}
+                </Formik>
             </Container>
         </Dialog>
     )

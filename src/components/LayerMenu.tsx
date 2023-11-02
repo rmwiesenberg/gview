@@ -95,7 +95,7 @@ export const LayerMenu = (
 
             {EditStyleDialog({
                 layer: layer,
-                style: style,
+                initialStyle: style,
                 open: isEditLayerActive,
                 onClose: () => {
                     setIsEditLayerActive(false)
