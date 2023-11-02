@@ -74,12 +74,10 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                 <Formik
                     initialValues={initialStyle}
                     validationSchema={StyleSchema}
-                    onSubmit={(newStyle) => {
+                    onSubmit={(style) => {
                         onClose()
-                        console.log(
-                            `Updating style: ${JSON.stringify(newStyle)}`
-                        )
-                        dispatch(setStyle([layer, newStyle]))
+                        console.log(`Updating style: ${JSON.stringify(style)}`)
+                        dispatch(setStyle({ layer, style }))
                     }}
                 >
                     {({ handleChange, values }) => (

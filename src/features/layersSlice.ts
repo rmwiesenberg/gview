@@ -17,6 +17,11 @@ export const initialState: LayersState = {
     styles: {},
 }
 
+interface SetStyleParams {
+    layer: GeoLayer
+    style: Style
+}
+
 export const layersSlice = createSlice({
     name: 'layers',
     initialState,
@@ -53,8 +58,8 @@ export const layersSlice = createSlice({
                 !state.isActive[action.payload.id]
             return state
         },
-        setStyle: (state, action: PayloadAction<[GeoLayer, Style]>) => {
-            const [layer, style] = action.payload
+        setStyle: (state, action: PayloadAction<SetStyleParams>) => {
+            const { layer, style } = action.payload
 
             state.styles[layer.id] = style
             return
