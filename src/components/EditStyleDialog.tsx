@@ -46,10 +46,10 @@ const SetColorField: React.FC<
             })}
             disableAlpha={true}
             onChange={(color) => {
-                const rgba = color.rgba
+                const rgb = color.rgb
                 setFieldValue(
                     field.name,
-                    new RawGetColor([rgba.r, rgba.g, rgba.b, rgba.a])
+                    new RawGetColor([rgb.r, rgb.g, rgb.b])
                 )
             }}
         />

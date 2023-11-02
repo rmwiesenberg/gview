@@ -111,7 +111,7 @@ export class FeaturesGeoLayer extends GeoLayer {
         return new GeoJsonLayer({
             data: this.features,
             pickable: true,
-            stroked: false,
+            stroked: true,
             filled: true,
             pointType: 'circle',
             lineWidthMinPixels: 1,
