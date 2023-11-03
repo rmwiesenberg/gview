@@ -19,7 +19,7 @@ function App() {
         <div>
             <Box
                 p={3}
-                sx={{ minWidth: 150, maxWidth: 300 }}
+                sx={{ minWidth: 480, width: 0.33 }}
                 style={{ position: 'relative', zIndex: '1' }}
             >
                 {LayerList()}
