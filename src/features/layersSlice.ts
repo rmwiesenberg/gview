@@ -22,6 +22,11 @@ interface SetStyleParams {
     style: Style
 }
 
+interface ReorderParams {
+    start: number
+    target: number
+}
+
 export const layersSlice = createSlice({
     name: 'layers',
     initialState,
@@ -53,6 +58,14 @@ export const layersSlice = createSlice({
 
             return state
         },
+        reorder: (state, action: PayloadAction<ReorderParams>) => {
+            const { start, target } = action.payload
+            const result = Array.from(state.ordered)
+            const [removed] = result.splice(start, 1)
+            result.splice(target, 0, removed)
+
+            return { ...state, ordered: result }
+        },
         toggleActive: (state, action: PayloadAction<GeoLayer>) => {
             state.isActive[action.payload.id] =
                 !state.isActive[action.payload.id]
@@ -67,7 +80,7 @@ export const layersSlice = createSlice({
     },
 })
 
-export const { addLayer, removeLayer, toggleActive, setStyle } =
+export const { addLayer, removeLayer, reorder, toggleActive, setStyle } =
     layersSlice.actions
 
 export default layersSlice.reducer

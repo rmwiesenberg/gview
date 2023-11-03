@@ -20,10 +20,11 @@ import React from 'react'
 import { GeoLayer } from '../common/GeoLayer'
 import { styled } from '@mui/material/styles'
 import { AddLayerDialog } from './AddLayerDialog'
-import { MoreVert } from '@mui/icons-material'
+import { DragHandle, MoreVert } from '@mui/icons-material'
 import { LayerMenu } from './LayerMenu'
 import { useAppDispatch, useAppSelector } from '../app/hook'
-import { toggleActive } from '../features/layersSlice'
+import { reorder, toggleActive } from '../features/layersSlice'
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean
@@ -40,46 +41,32 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
     }),
 }))
 
-const LayerItem = (
-    layer: GeoLayer,
-    isActive: boolean,
-    handleClick: (event: React.MouseEvent<HTMLElement>) => void,
-    handleToggle: () => void
-) => {
-    const labelId = `layer-list-item-${layer.name}`
+const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
+    // styles we need to apply on draggables
+    ...draggableStyle,
 
-    return (
-        <div>
-            <ListItem
-                key={layer.name}
-                secondaryAction={
-                    <Tooltip title="Layer">
-                        <IconButton
-                            onClick={handleClick}
-                            size="small"
-                            sx={{ ml: 2 }}
-                            aria-haspopup="true"
-                        >
-                            <MoreVert sx={{ width: 32, height: 32 }} />
-                        </IconButton>
-                    </Tooltip>
-                }
-                disablePadding
-            >
-                <ListItemIcon>
-                    <Checkbox
-                        edge="start"
-                        checked={isActive}
-                        onChange={() => handleToggle()}
-                        tabIndex={-1}
-                        disableRipple
-                        inputProps={{ 'aria-labelledby': labelId }}
-                    />
-                </ListItemIcon>
-                <ListItemText id={labelId} primary={layer.name} />
-            </ListItem>
-        </div>
-    )
+    ...(isDragging && {
+        background: 'rgb(235,235,235)',
+    }),
+})
+
+export const useStrictDroppable = (loading: boolean) => {
+    const [enabled, setEnabled] = React.useState(false)
+
+    React.useEffect(() => {
+        let animation: any
+
+        if (!loading) {
+            animation = requestAnimationFrame(() => setEnabled(true))
+        }
+
+        return () => {
+            cancelAnimationFrame(animation)
+            setEnabled(false)
+        }
+    }, [loading])
+
+    return [enabled]
 }
 
 export const LayerList = () => {
@@ -90,6 +77,7 @@ export const LayerList = () => {
     const [isAddLayerActive, setIsAddLayerActive] = React.useState(false)
     const [activeLayer, setActiveLayer] = React.useState<null | GeoLayer>(null)
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+    const [droppingEnabled] = useStrictDroppable(false)
 
     const handleExpandClick = () => {
         setExpanded(!expanded)
@@ -100,22 +88,18 @@ export const LayerList = () => {
         setActiveLayer(null)
     }
 
-    const getLayerItems = () => {
-        const listItems = []
-        for (let layer of layersState.ordered) {
-            listItems.push(
-                LayerItem(
-                    layer,
-                    layersState.isActive[layer.id]!,
-                    (event: React.MouseEvent<HTMLElement>) => {
-                        setAnchorEl(event.currentTarget)
-                        setActiveLayer(layer)
-                    },
-                    () => dispatch(toggleActive(layer))
-                )
-            )
+    const onDragEnd = (result: any) => {
+        // dropped outside the list
+        if (!result.destination) {
+            return
         }
-        return listItems
+
+        dispatch(
+            reorder({
+                start: result.source.index,
+                target: result.destination.index,
+            })
+        )
     }
 
     return (
@@ -147,7 +131,114 @@ export const LayerList = () => {
                 </CardActions>
                 <Collapse in={expanded} timeout="auto" unmountOnExit>
                     <CardContent>
-                        <List>{getLayerItems()}</List>
+                        <DragDropContext onDragEnd={onDragEnd}>
+                            {droppingEnabled && (
+                                <Droppable droppableId="droppable">
+                                    {(provided, snapshot) => (
+                                        <List
+                                            disablePadding
+                                            {...provided.droppableProps}
+                                            ref={provided.innerRef}
+                                        >
+                                            {layersState.ordered.map(
+                                                (layer, i) => (
+                                                    <Draggable
+                                                        key={layer.id}
+                                                        draggableId={layer.id}
+                                                        index={i}
+                                                    >
+                                                        {(
+                                                            provided,
+                                                            snapshot
+                                                        ) => (
+                                                            <ListItem
+                                                                ref={
+                                                                    provided.innerRef
+                                                                }
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                style={getItemStyle(
+                                                                    snapshot.isDragging,
+                                                                    provided
+                                                                        .draggableProps
+                                                                        .style
+                                                                )}
+                                                                key={layer.name}
+                                                                secondaryAction={
+                                                                    <Tooltip title="Layer">
+                                                                        <IconButton
+                                                                            edge="end"
+                                                                            onClick={(
+                                                                                event: React.MouseEvent<HTMLElement>
+                                                                            ) => {
+                                                                                setAnchorEl(
+                                                                                    event.currentTarget
+                                                                                )
+                                                                                setActiveLayer(
+                                                                                    layer
+                                                                                )
+                                                                            }}
+                                                                            aria-haspopup="true"
+                                                                        >
+                                                                            <MoreVert
+                                                                                sx={{
+                                                                                    width: 32,
+                                                                                    height: 32,
+                                                                                }}
+                                                                            />
+                                                                        </IconButton>
+                                                                    </Tooltip>
+                                                                }
+                                                            >
+                                                                <ListItemIcon>
+                                                                    <DragHandle />
+                                                                </ListItemIcon>
+                                                                <ListItemIcon>
+                                                                    <Checkbox
+                                                                        edge="start"
+                                                                        checked={
+                                                                            layersState
+                                                                                .isActive[
+                                                                                layer
+                                                                                    .id
+                                                                            ]!
+                                                                        }
+                                                                        onChange={() =>
+                                                                            dispatch(
+                                                                                toggleActive(
+                                                                                    layer
+                                                                                )
+                                                                            )
+                                                                        }
+                                                                        tabIndex={
+                                                                            -1
+                                                                        }
+                                                                        disableRipple
+                                                                    />
+                                                                </ListItemIcon>
+                                                                <ListItemText
+                                                                    primary={
+                                                                        layer.name
+                                                                    }
+                                                                    primaryTypographyProps={{
+                                                                        style: {
+                                                                            whiteSpace:
+                                                                                'normal',
+                                                                            overflow:
+                                                                                'hidden',
+                                                                        },
+                                                                    }}
+                                                                />
+                                                            </ListItem>
+                                                        )}
+                                                    </Draggable>
+                                                )
+                                            )}
+                                        </List>
+                                    )}
+                                </Droppable>
+                            )}
+                        </DragDropContext>
                     </CardContent>
                 </Collapse>
             </Card>
