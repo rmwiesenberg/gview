@@ -51,6 +51,9 @@ export const viewSlice = createSlice({
     name: 'view',
     initialState,
     reducers: {
+        setNewState: (state, action: PayloadAction<MapInfo>) => {
+            return { ...state, lastSet: action.payload }
+        },
         focusLayer: (state, action: PayloadAction<GeoLayer>) => {
             const layer = action.payload
 
@@ -84,6 +87,6 @@ export const viewSlice = createSlice({
     },
 })
 
-export const { focusLayer } = viewSlice.actions
+export const { setNewState, focusLayer } = viewSlice.actions
 
 export default viewSlice.reducer
