@@ -1,4 +1,4 @@
-import { GeoLayer } from '../common/GeoLayer'
+import { FeaturesGeoLayer, GeoLayer } from '../common/GeoLayer'
 import { rgbaToHex } from '@uiw/color-convert'
 import {
     Box,
@@ -7,13 +7,22 @@ import {
     Dialog,
     DialogTitle,
     Grid,
+    InputLabel,
+    MenuItem,
+    Select,
     Slider,
     Typography,
 } from '@mui/material'
 import React from 'react'
 import { useAppDispatch } from '../app/hook'
 import { setStyle } from '../features/layersSlice'
-import { GetColor, RawGetColor, Style } from '../common/Style'
+import {
+    Color,
+    FieldGetColor,
+    GetColor,
+    RawGetColor,
+    Style,
+} from '../common/Style'
 import Sketch from '@uiw/react-color-sketch'
 import { Field, FieldProps, Form, Formik } from 'formik'
 import * as Yup from 'yup'
@@ -30,29 +39,60 @@ export interface EditStyleProps {
 const spacer = () => <Box sx={{ height: 16 }}></Box>
 
 const SetColorField: React.FC<
-    FieldProps<GetColor> & { prefix: React.ReactNode }
-> = ({ field, form: { setFieldValue } }) => {
-    if (typeof field.value.getColor == 'function') return <div></div>
-
-    const color = field.value.getColor
+    FieldProps<GetColor> & { prefix: React.ReactNode; layer: FeaturesGeoLayer }
+> = ({ field, form: { setFieldValue }, layer }) => {
+    // @ts-ignore
+    const fieldName = field.value.field ?? ''
+    const defaultValue = field.value.defaultValue
 
     return (
-        <Sketch
-            color={rgbaToHex({
-                r: color[0],
-                g: color[1],
-                b: color[2],
-                a: color[3] ?? 1,
-            })}
-            disableAlpha={true}
-            onChange={(color) => {
-                const rgb = color.rgb
-                setFieldValue(
-                    field.name,
-                    new RawGetColor([rgb.r, rgb.g, rgb.b])
-                )
-            }}
-        />
+        <div>
+            <InputLabel id="property">By property?</InputLabel>
+            <Select
+                id="property"
+                label="By property?"
+                fullWidth
+                value={fieldName}
+                onChange={(event) => {
+                    const fieldName = event.target.value as string
+                    setFieldValue(
+                        field.name,
+                        fieldName
+                            ? new FieldGetColor(fieldName, defaultValue)
+                            : new RawGetColor(defaultValue)
+                    )
+                }}
+            >
+                <MenuItem value={''} key="Unset">
+                    Unset
+                </MenuItem>
+                {Object.keys(layer.hashable_props).map((fieldName) => (
+                    <MenuItem value={fieldName} key={fieldName}>
+                        Property: {fieldName}
+                    </MenuItem>
+                ))}
+            </Select>
+            <Typography>Default Value:</Typography>
+            <Sketch
+                color={rgbaToHex({
+                    r: field.value.defaultValue[0],
+                    g: field.value.defaultValue[1],
+                    b: field.value.defaultValue[2],
+                    a: field.value.defaultValue[3] ?? 1,
+                })}
+                disableAlpha={true}
+                onChange={(inputColor) => {
+                    const rgb = inputColor.rgb
+                    const defaultValue: Color = [rgb.r, rgb.g, rgb.b]
+                    setFieldValue(
+                        field.name,
+                        fieldName
+                            ? new FieldGetColor(fieldName, defaultValue)
+                            : new RawGetColor(defaultValue)
+                    )
+                }}
+            />
+        </div>
     )
 }
 
@@ -91,6 +131,7 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                                         <Field
                                             id="getStrokeColor"
                                             name="getStrokeColor"
+                                            layer={layer}
                                             component={SetColorField}
                                         />
                                     </Grid>
@@ -101,6 +142,7 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                                         <Field
                                             id="getFillColor"
                                             name="getFillColor"
+                                            layer={layer}
                                             component={SetColorField}
                                         />
                                     </Grid>

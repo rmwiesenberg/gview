@@ -17,10 +17,10 @@ class FieldGet<T> {
 
     get = (feature: Feature): T => {
         const properties = feature.properties
-        if (properties == null) return this.defaultValue
+        if (!properties) return this.defaultValue
 
         const fieldValue = properties[this.field]
-        if (fieldValue == null) return this.defaultValue
+        if (!fieldValue) return this.defaultValue
 
         const storedValue = this.valueLookup[fieldValue]
         if (storedValue) return storedValue
@@ -33,19 +33,27 @@ class FieldGet<T> {
 
 export type Color = [number, number, number, number] | [number, number, number]
 const randomColor = (): Color => {
-    return [0, 0, 0, 255]
+    const randomVal = () => Math.random() * 255
+    let rgb: Color = [randomVal(), randomVal(), randomVal()]
+    if (rgb[0] + rgb[1] + rgb[2] > 255 * 2) {
+        rgb = [rgb[0] / 2, rgb[1] / 2, rgb[2] / 2]
+    }
+    return rgb
 }
 
 type ColorFunction = (feature: Feature) => Color
 export interface GetColor {
     type: GetterType
     getColor: ColorFunction | Color
+    defaultValue: Color
 }
 export class RawGetColor implements GetColor {
     type: GetterType = 'raw'
     getColor: Color
+    defaultValue: Color
 
     constructor(color: Color) {
+        this.defaultValue = color
         this.getColor = color
     }
 }
@@ -53,8 +61,8 @@ export class FieldGetColor extends FieldGet<Color> implements GetColor {
     type: GetterType = 'field'
     getColor = this.get
 
-    constructor(field: string) {
-        super(field, randomColor(), () => randomColor())
+    constructor(field: string, defaultValue: Color) {
+        super(field, defaultValue, () => randomColor())
     }
 }
 

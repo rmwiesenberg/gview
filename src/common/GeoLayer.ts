@@ -9,6 +9,7 @@ import { featureCollection } from '@turf/helpers'
 import { v4 as uuidv4 } from 'uuid'
 import { Bounds } from './mapInfo'
 import { Style } from './Style'
+import { Dictionary } from '@reduxjs/toolkit'
 
 type SetHoverInfoCallback = (info: any) => void
 type LayerType = 'base' | 'feature'
@@ -80,12 +81,24 @@ export class TileGeoLayer extends GeoLayer {
 export class FeaturesGeoLayer extends GeoLayer {
     type: LayerType = 'feature'
     features: Feature[]
+    hashable_props: Dictionary<Set<any>> = {}
     bounds: Bounds | null = null
 
     constructor({ name, features }: { name: string; features: Feature[] }) {
         super(name)
 
         this.features = features
+
+        for (const feature of this.features) {
+            for (const key in feature.properties) {
+                const value = feature.properties[key]
+                if (!this.hashable_props[key])
+                    this.hashable_props[key] = new Set()
+                if (!value) continue
+                this.hashable_props[key]!.add(value)
+            }
+        }
+
         const layerBBox = bbox(featureCollection(this.features))
         this.bounds = new Bounds(
             { lng: layerBBox[0], lat: layerBBox[1] },
@@ -93,7 +106,9 @@ export class FeaturesGeoLayer extends GeoLayer {
         )
 
         console.log(
-            `New layer ${this.name} with bounds ${JSON.stringify(this.bounds)}`
+            `New layer ${this.name} with
+            bounds ${JSON.stringify(this.bounds)} and 
+            props ${Object.keys(this.hashable_props)}`
         )
     }
 
@@ -105,6 +120,13 @@ export class FeaturesGeoLayer extends GeoLayer {
             getLineWidth: style.getStrokeWidth?.getNumber,
             lineWidthUnits: style.strokeWidthUnits,
             lineWidthScale: style.strokeWidthScale,
+            updateTriggers: {
+                getFillColor: style.getFillColor,
+                getLineColor: style.getStrokeColor,
+                getLineWidth: style.getStrokeWidth,
+                lineWidthUnits: style.strokeWidthUnits,
+                lineWidthScale: style.strokeWidthScale,
+            },
         }
 
         return new GeoJsonLayer({
@@ -117,10 +139,7 @@ export class FeaturesGeoLayer extends GeoLayer {
             pointRadiusMinPixels: 1,
             ...inferredStyle,
             getPosition: (d: any) => d.position,
-            onHover: (info) => {
-                console.log(info)
-                setHoverInfo(info)
-            },
+            onHover: (info) => setHoverInfo(info),
         })
     }
 }
