@@ -27,13 +27,13 @@ function App() {
     }
 
     const mapView = new MapView({ id: 'map', controller: true })
-    const globeView = new _GlobeView({ id: 'globe' })
+    const globeView = new _GlobeView({ id: 'globe', controller: true })
 
     return (
         <div>
             <Box
                 p={3}
-                sx={{ minWidth: 480, width: 0.33 }}
+                sx={{ minWidth: 120, width: 0.33 }}
                 style={{ position: 'relative', zIndex: '1' }}
             >
                 {LayerList()}

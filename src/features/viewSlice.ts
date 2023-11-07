@@ -10,9 +10,9 @@ export interface ViewManagement {
 
 export const initialState: ViewManagement = {
     lastSet: {
-        longitude: -83.0,
-        latitude: 42.33,
-        zoom: 11,
+        longitude: 0,
+        latitude: 0,
+        zoom: 1,
         pitch: 30,
         maxPitch: 89.9,
         maxZoom: 21,
