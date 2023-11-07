@@ -27,7 +27,7 @@ function App() {
     }
 
     const mapView = new MapView({ id: 'map', controller: true })
-    const globeView = new _GlobeView({ id: 'globe' })
+    const globeView = new _GlobeView({ id: 'globe', controller: true })
 
     return (
         <div>
