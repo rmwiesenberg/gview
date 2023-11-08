@@ -107,7 +107,7 @@ export const getNewFeatureStyle = (): Style => {
         ...getDefaultStyle(),
         getFillColor: new RawGetColor(randomColor()),
         getStrokeColor: new RawGetColor(randomColor()),
-        getStrokeWidth: new RawGetNumber(1),
+        getStrokeWidth: new RawGetNumber(0.1),
         strokeWidthUnits: 'pixels',
         strokeWidthScale: 1,
     }

@@ -120,6 +120,9 @@ export class FeaturesGeoLayer extends GeoLayer {
             getLineWidth: style.getStrokeWidth?.getNumber,
             lineWidthUnits: style.strokeWidthUnits,
             lineWidthScale: style.strokeWidthScale,
+            getPointRadius: style.getStrokeWidth?.getNumber,
+            getRadiusUnits: style.strokeWidthUnits,
+            pointRadiusScale: style.strokeWidthScale,
             updateTriggers: {
                 getFillColor: style.getFillColor,
                 getLineColor: style.getStrokeColor,
