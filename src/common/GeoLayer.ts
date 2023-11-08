@@ -117,18 +117,26 @@ export class FeaturesGeoLayer extends GeoLayer {
             opacity: style.opacity,
             getFillColor: style.getFillColor?.getColor,
             getLineColor: style.getStrokeColor?.getColor,
+
             getLineWidth: style.getStrokeWidth?.getNumber,
-            lineWidthUnits: style.strokeWidthUnits,
             lineWidthScale: style.strokeWidthScale,
-            getPointRadius: style.getStrokeWidth?.getNumber,
-            getRadiusUnits: style.strokeWidthUnits,
-            pointRadiusScale: style.strokeWidthScale,
+            lineWidthUnits: style.strokeWidthUnits,
+
+            getPointRadius: style.getPointRadius?.getNumber,
+            pointRadiusScale: style.pointRadiusScale,
+            getRadiusUnits: style.pointRadiusUnits,
+
             updateTriggers: {
                 getFillColor: style.getFillColor,
                 getLineColor: style.getStrokeColor,
+
                 getLineWidth: style.getStrokeWidth,
-                lineWidthUnits: style.strokeWidthUnits,
                 lineWidthScale: style.strokeWidthScale,
+                lineWidthUnits: style.strokeWidthUnits,
+
+                getPointRadius: style.getPointRadius,
+                pointRadiusScale: style.strokeWidthUnits,
+                getRadiusUnits: style.pointRadiusUnits,
             },
         }
 
