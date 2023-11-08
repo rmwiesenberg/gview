@@ -11,6 +11,7 @@ import {
     MenuItem,
     Select,
     Slider,
+    TextField,
     Typography,
 } from '@mui/material'
 import React from 'react'
@@ -20,12 +21,15 @@ import {
     Color,
     FieldGetColor,
     GetColor,
+    GetNumber,
     RawGetColor,
+    RawGetNumber,
     Style,
 } from '../common/Style'
 import Sketch from '@uiw/react-color-sketch'
 import { Field, FieldProps, Form, Formik } from 'formik'
 import * as Yup from 'yup'
+import { TextField as FormikTextField } from 'formik-mui'
 
 type CloseFormCallback = () => void
 
@@ -96,8 +100,31 @@ const SetColorField: React.FC<
     )
 }
 
+const SetNumberField: React.FC<
+    FieldProps<GetNumber> & { prefix: React.ReactNode }
+> = ({ field, form: { setFieldValue } }) => {
+    if (typeof field.value.getNumber == 'function') return <div></div>
+
+    const number = field.value.getNumber
+
+    return (
+        <TextField
+            id={field.name}
+            label="base"
+            defaultValue={number}
+            onChange={(number) => {
+                setFieldValue(
+                    field.name,
+                    new RawGetNumber(Number.parseFloat(number.target.value))
+                )
+            }}
+        />
+    )
+}
+
 const StyleSchema = Yup.object().shape({
     opacity: Yup.number().min(0).max(1),
+    strokeWidthScale: Yup.number().required('Required').min(1).max(9),
 })
 
 export const EditStyleDialog = (props: EditStyleProps) => {
@@ -136,6 +163,7 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                                         />
                                     </Grid>
                                 )}
+
                                 {values.getFillColor && (
                                     <Grid item xs={6}>
                                         <Typography>Fill Color</Typography>
@@ -147,30 +175,87 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                                         />
                                     </Grid>
                                 )}
+
+                                {spacer()}
+
+                                <Grid item xs={12}>
+                                    <Typography>Stroke</Typography>
+                                </Grid>
+
+                                <Grid item xs={3}>
+                                    <Field
+                                        id="getStrokeWidth"
+                                        name="getStrokeWidth"
+                                        component={SetNumberField}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={1}>
+                                    <div
+                                        style={{
+                                            justifyContent: 'center',
+                                            height: 1,
+                                            lineHeight: 1,
+                                            textAlign: 'center',
+                                        }}
+                                    >
+                                        <h3>*</h3>
+                                    </div>
+                                </Grid>
+
+                                <Grid item xs={3}>
+                                    <Field
+                                        id="strokeWidthScale"
+                                        name="strokeWidthScale"
+                                        label="scale"
+                                        component={FormikTextField}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={5}>
+                                    <Select
+                                        id="strokeWidthUnits"
+                                        name="strokeWidthUnits"
+                                        fullWidth
+                                        defaultValue={values.strokeWidthUnits}
+                                        onChange={handleChange}
+                                    >
+                                        <MenuItem value={'meters'} key="meters">
+                                            meters
+                                        </MenuItem>
+
+                                        <MenuItem value={'pixels'} key="pixels">
+                                            pixels
+                                        </MenuItem>
+                                    </Select>
+                                </Grid>
+
+                                {spacer()}
+
+                                <Grid item xs={12}>
+                                    <Typography>Opacity</Typography>
+                                    <Slider
+                                        id="opacity"
+                                        name="opacity"
+                                        min={0}
+                                        step={1e-2}
+                                        max={1}
+                                        defaultValue={values.opacity}
+                                        valueLabelDisplay="auto"
+                                        onChange={handleChange}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        fullWidth={true}
+                                    >
+                                        Apply
+                                    </Button>
+                                </Grid>
                             </Grid>
-
-                            {spacer()}
-
-                            <Typography>Opacity</Typography>
-                            <Slider
-                                id="opacity"
-                                name="opacity"
-                                min={0}
-                                step={1e-2}
-                                max={1}
-                                defaultValue={values.opacity}
-                                valueLabelDisplay="auto"
-                                onChange={handleChange}
-                            />
-                            {spacer()}
-
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                fullWidth={true}
-                            >
-                                Apply
-                            </Button>
                             {spacer()}
                         </Form>
                     )}
