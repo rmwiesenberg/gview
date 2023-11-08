@@ -94,9 +94,14 @@ export interface Style {
     opacity: number
     getFillColor?: GetColor
     getStrokeColor?: GetColor
+
     getStrokeWidth?: GetNumber
-    strokeWidthUnits?: WidthUnits
     strokeWidthScale?: number
+    strokeWidthUnits?: WidthUnits
+
+    getPointRadius?: GetNumber
+    pointRadiusScale?: number
+    pointRadiusUnits?: WidthUnits
 }
 
 export const getDefaultStyle = (): Style => {
@@ -105,10 +110,16 @@ export const getDefaultStyle = (): Style => {
 export const getNewFeatureStyle = (): Style => {
     return {
         ...getDefaultStyle(),
+
         getFillColor: new RawGetColor(randomColor()),
         getStrokeColor: new RawGetColor(randomColor()),
-        getStrokeWidth: new RawGetNumber(0.1),
-        strokeWidthUnits: 'pixels',
+
+        getStrokeWidth: new RawGetNumber(1),
         strokeWidthScale: 1,
+        strokeWidthUnits: 'pixels',
+
+        getPointRadius: new RawGetNumber(1),
+        pointRadiusScale: 1,
+        pointRadiusUnits: 'pixels',
     }
 }

@@ -179,7 +179,7 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                                 {spacer()}
 
                                 <Grid item xs={12}>
-                                    <Typography>Stroke</Typography>
+                                    <Typography>Stroke Width</Typography>
                                 </Grid>
 
                                 <Grid item xs={3}>
@@ -218,6 +218,60 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                                         name="strokeWidthUnits"
                                         fullWidth
                                         defaultValue={values.strokeWidthUnits}
+                                        onChange={handleChange}
+                                    >
+                                        <MenuItem value={'meters'} key="meters">
+                                            meters
+                                        </MenuItem>
+
+                                        <MenuItem value={'pixels'} key="pixels">
+                                            pixels
+                                        </MenuItem>
+                                    </Select>
+                                </Grid>
+
+                                {spacer()}
+
+                                <Grid item xs={12}>
+                                    <Typography>Point Radius</Typography>
+                                </Grid>
+
+                                <Grid item xs={3}>
+                                    <Field
+                                        id="getPointRadius"
+                                        name="getPointRadius"
+                                        component={SetNumberField}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={1}>
+                                    <div
+                                        style={{
+                                            justifyContent: 'center',
+                                            height: 1,
+                                            lineHeight: 1,
+                                            textAlign: 'center',
+                                        }}
+                                    >
+                                        <h3>*</h3>
+                                    </div>
+                                </Grid>
+
+                                <Grid item xs={3}>
+                                    <Field
+                                        id="pointRadiusScale"
+                                        name="pointRadiusScale"
+                                        label="scale"
+                                        component={FormikTextField}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={5}>
+                                    <Select
+                                        id="pointRadiusUnits"
+                                        name="pointRadiusUnits"
+                                        fullWidth
+                                        defaultValue={values.pointRadiusUnits}
                                         onChange={handleChange}
                                     >
                                         <MenuItem value={'meters'} key="meters">
