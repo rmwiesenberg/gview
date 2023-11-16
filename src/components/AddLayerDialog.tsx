@@ -164,7 +164,7 @@ const AddFileLayerForm = (cb: CloseFormCallback) => {
             <Typography>or</Typography>
             {spacer()}
             <Formik
-                initialValues={{ url: '' }}
+                initialValues={{ url: 'https://' }}
                 validationSchema={RemoteFileSchema}
                 onSubmit={(values) => {
                     cb()
