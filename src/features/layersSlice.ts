@@ -46,7 +46,7 @@ export const layersSlice = createSlice({
         },
         addLayerUniqueSource: (state, action: PayloadAction<GeoLayer>) => {
             const newLayer = action.payload
-            if (state.ordered.some((value) => value.source == newLayer.source))
+            if (state.ordered.some((value) => value.source === newLayer.source))
                 return state
 
             state.layers[newLayer.id] = newLayer

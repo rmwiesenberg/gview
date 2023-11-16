@@ -32,7 +32,7 @@ function App() {
                 addLayerUniqueSource(
                     new TileGeoLayer({
                         name: xyz,
-                        url: `http://${xyz}`,
+                        url: `https://${xyz}`,
                         minZoom: 0,
                         maxZoom: 19,
                     })
@@ -40,15 +40,13 @@ function App() {
             )
         }
         for (const file of queryParams.getAll('file')) {
-            for await (let newLayer of geoLayerFromFile(`http://${file}`)) {
+            for await (let newLayer of geoLayerFromFile(`https://${file}`)) {
                 dispatch(addLayerUniqueSource(newLayer))
             }
         }
-    }
-    if (queryParams.size) {
-        loadParams()
         setQueryParams()
     }
+    if (queryParams.size) loadParams()
 
     let activeLayers = []
     for (const layer of layersState.ordered) {
