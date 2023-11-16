@@ -9,6 +9,7 @@
     "@loaders.gl/core": "^3.4.14",
     "@loaders.gl/geopackage": "^3.4.14",
     "@loaders.gl/json": "^3.4.14",
+    "@loaders.gl/kml": "^3.4.14",
     "@mui/icons-material": "^5.14.14",
     "@mui/material": "^5.14.14",
     "@mui/styles": "^5.14.14",
