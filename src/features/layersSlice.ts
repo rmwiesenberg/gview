@@ -76,7 +76,7 @@ export const layersSlice = createSlice({
             state.ordered = [
                 ...state.ordered.slice(0, i),
                 newLayer,
-                ...state.ordered.slice(i + 1),
+                ...state.ordered.slice(i),
             ]
             state.isActive[newLayer.id] = true
             state.styles[newLayer.id] =
