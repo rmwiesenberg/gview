@@ -13,9 +13,14 @@ Dentist data &copy; [UK Government](https://www.nationalarchives.gov.uk/doc/open
 gview is an in-browser viewer for geographic data that pulls visualisation from [deck.gl](https://deck.gl) and GIS ingestion tools from [loaders.gl](https://loaders/gl) and [turf](https://turfjs.org) to create an all-in-one geographic data exploration tool.
 
 Some of gview's key features are:
-- loading and displaying GIS files (.gpkg, .geojson)
+- loading and displaying GIS files (GPKG, GeoJSON, KML)
 - browsing individual feature data
 - connecting to tile servers
+- parsing url params for on-open loading, example:
+    - [gview.rwies.com<br>
+       ?xyz=tile.openstreetmap.org/{z}/{x}/{y}.png<br>
+       &file=raw.githubusercontent.com/visgl/deck.gl-data/master/examples/geojson/vancouver-blocks.json<br>
+       &file=raw.githubusercontent.com/ngageoint/geopackage-js/master/test/fixtures/rivers.gpkg](https://gview.rwies.com/?xyz=tile.openstreetmap.org/{z}/{x}/{y}.png&file=raw.githubusercontent.com/visgl/deck.gl-data/master/examples/geojson/vancouver-blocks.json&file=raw.githubusercontent.com/ngageoint/geopackage-js/master/test/fixtures/rivers.gpkg)
 
 ## Getting Started
 
