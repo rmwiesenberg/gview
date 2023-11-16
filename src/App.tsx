@@ -8,18 +8,47 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { LayerList } from './components/LayerList'
-import { useAppSelector } from './app/hook'
+import { useAppDispatch, useAppSelector } from './app/hook'
 import { Map as MapIcon, Public as PublicIcon } from '@mui/icons-material'
 import { _GlobeView, MapView } from '@deck.gl/core/typed'
+import { useSearchParams } from 'react-router-dom'
+import { addLayerUniqueSource } from './features/layersSlice'
+import { geoLayerFromFile, TileGeoLayer } from './common/GeoLayer'
 
 type ViewType = 'map' | 'globe'
 
 function App() {
+    const [queryParams, setQueryParams] = useSearchParams()
     const [hoverInfo, setHoverInfo] = React.useState<any>({})
     const [viewType, setViewType] = React.useState<ViewType>('map')
 
     const layersState = useAppSelector((state) => state.layers)
     const viewState = useAppSelector((state) => state.view)
+    const dispatch = useAppDispatch()
+
+    const loadParams = async () => {
+        for (const xyz of queryParams.getAll('xyz')) {
+            dispatch(
+                addLayerUniqueSource(
+                    new TileGeoLayer({
+                        name: xyz,
+                        url: `http://${xyz}`,
+                        minZoom: 0,
+                        maxZoom: 19,
+                    })
+                )
+            )
+        }
+        for (const file of queryParams.getAll('file')) {
+            for await (let newLayer of geoLayerFromFile(`http://${file}`)) {
+                dispatch(addLayerUniqueSource(newLayer))
+            }
+        }
+    }
+    if (queryParams.size) {
+        loadParams()
+        setQueryParams()
+    }
 
     let activeLayers = []
     for (const layer of layersState.ordered) {
@@ -83,9 +112,7 @@ function App() {
                         l.makeLayer(layersState.styles[l.id]!, setHoverInfo)
                     )
                     .reverse()}
-            >
-                {}
-            </DeckGL>
+            />
             {hoverInfo.object && (
                 <div
                     style={{

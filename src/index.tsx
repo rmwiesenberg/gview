@@ -7,6 +7,7 @@ import { DevSupport } from '@react-buddy/ide-toolbox'
 import { ComponentPreviews, useInitial } from './dev'
 import { Provider } from 'react-redux'
 import { store } from './app/store'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
@@ -16,7 +17,11 @@ root.render(
             useInitialHook={useInitial}
         >
             <Provider store={store}>
-                <App />
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<App />} />
+                    </Routes>
+                </BrowserRouter>
             </Provider>
         </DevSupport>
     </React.StrictMode>

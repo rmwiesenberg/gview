@@ -44,6 +44,21 @@ export const layersSlice = createSlice({
 
             return state
         },
+        addLayerUniqueSource: (state, action: PayloadAction<GeoLayer>) => {
+            const newLayer = action.payload
+            if (state.ordered.some((value) => value.source == newLayer.source))
+                return state
+
+            state.layers[newLayer.id] = newLayer
+            state.ordered = [newLayer, ...state.ordered]
+            state.isActive[newLayer.id] = true
+            state.styles[newLayer.id] =
+                newLayer.type === 'feature'
+                    ? getNewFeatureStyle()
+                    : getDefaultStyle()
+
+            return state
+        },
         removeLayer: (state, action: PayloadAction<GeoLayer>) => {
             const removedLayer = action.payload
             const i = state.ordered.indexOf(removedLayer)
@@ -80,7 +95,13 @@ export const layersSlice = createSlice({
     },
 })
 
-export const { addLayer, removeLayer, reorder, toggleActive, setStyle } =
-    layersSlice.actions
+export const {
+    addLayer,
+    addLayerUniqueSource,
+    removeLayer,
+    reorder,
+    toggleActive,
+    setStyle,
+} = layersSlice.actions
 
 export default layersSlice.reducer

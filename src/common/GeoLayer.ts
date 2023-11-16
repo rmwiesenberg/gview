@@ -18,11 +18,13 @@ type LayerType = 'base' | 'feature'
 export abstract class GeoLayer {
     id: string
     type: LayerType = 'base'
+    source: string
     name: string
     bounds: Bounds | null = null
 
-    protected constructor(name: string) {
+    protected constructor(source: string, name: string) {
         this.id = uuidv4()
+        this.source = source
         this.name = name
     }
 
@@ -50,7 +52,7 @@ export class TileGeoLayer extends GeoLayer {
         minZoom: number
         maxZoom: number
     }) {
-        super(name)
+        super(url, name)
         this.url = url
         this.minZoom = minZoom
         this.maxZoom = maxZoom
@@ -85,8 +87,16 @@ export class FeaturesGeoLayer extends GeoLayer {
     hashable_props: Dictionary<Set<any>> = {}
     bounds: Bounds | null = null
 
-    constructor({ name, features }: { name: string; features: Feature[] }) {
-        super(name)
+    constructor({
+        source,
+        name,
+        features,
+    }: {
+        source: string
+        name: string
+        features: Feature[]
+    }) {
+        super(source, name)
 
         this.features = features
 
@@ -171,7 +181,7 @@ export async function* geoLayerFromFile(
         },
     }
 
-    let name = typeof file == 'string' ? file : file.name
+    let name = typeof file == 'string' ? file.split('//')[1] : file.name
 
     let ext = name.toLowerCase().split('.').pop()
     console.log(`Loading ${ext} file`)
@@ -181,6 +191,7 @@ export async function* geoLayerFromFile(
             const geopackage: any = await load(file, GeoPackageLoader, options)
             for (let layerName in geopackage) {
                 yield new FeaturesGeoLayer({
+                    source: name,
                     name: `${name}-${layerName}`,
                     features: geopackage[layerName],
                 })
@@ -193,6 +204,7 @@ export async function* geoLayerFromFile(
                 options
             )
             yield new FeaturesGeoLayer({
+                source: name,
                 name: name,
                 features: rawLayer.features,
             })
