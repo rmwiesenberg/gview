@@ -1,5 +1,5 @@
 import { ListItemIcon, Menu, MenuItem } from '@mui/material'
-import { FormatPaint, GpsFixed } from '@mui/icons-material'
+import { EditNote, FormatPaint, GpsFixed } from '@mui/icons-material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { GeoLayer } from '../common/GeoLayer'
 import { useAppDispatch } from '../app/hook'
@@ -8,6 +8,7 @@ import { focusLayer } from '../features/viewSlice'
 import React from 'react'
 import { EditStyleDialog } from './EditStyleDialog'
 import { Style } from '../common/Style'
+import { EditLayerDialog } from './EditLayerDialog'
 
 export const LayerMenu = (
     layer: null | GeoLayer,
@@ -16,6 +17,7 @@ export const LayerMenu = (
     handleClose: () => void
 ) => {
     const [isEditLayerActive, setIsEditLayerActive] = React.useState(false)
+    const [isEditStyleActive, setIsEditStyleActive] = React.useState(false)
 
     const dispatch = useAppDispatch()
     const open = Boolean(anchorEl)
@@ -76,10 +78,22 @@ export const LayerMenu = (
                     }}
                 >
                     <ListItemIcon>
-                        <FormatPaint fontSize="small" />
+                        <EditNote fontSize="small" />
                     </ListItemIcon>
-                    Edit style
+                    Edit properties
                 </MenuItem>
+                {layer?.type === 'feature' && (
+                    <MenuItem
+                        onClick={() => {
+                            if (layer != null) setIsEditStyleActive(true)
+                        }}
+                    >
+                        <ListItemIcon>
+                            <FormatPaint fontSize="small" />
+                        </ListItemIcon>
+                        Edit style
+                    </MenuItem>
+                )}
                 <MenuItem
                     onClick={() => {
                         if (layer != null) dispatch(removeLayer(layer))
@@ -93,12 +107,21 @@ export const LayerMenu = (
                 </MenuItem>
             </Menu>
 
-            {EditStyleDialog({
+            {EditLayerDialog({
                 layer: layer,
-                initialStyle: style,
                 open: isEditLayerActive,
                 onClose: () => {
                     setIsEditLayerActive(false)
+                    handleClose()
+                },
+            })}
+
+            {EditStyleDialog({
+                layer: layer,
+                initialStyle: style,
+                open: isEditStyleActive,
+                onClose: () => {
+                    setIsEditStyleActive(false)
                     handleClose()
                 },
             })}
