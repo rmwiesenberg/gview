@@ -1,9 +1,10 @@
 import { TileLayer } from '@deck.gl/geo-layers/typed'
 import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers/typed'
 import type { Feature } from 'geojson'
-import { load } from '@loaders.gl/core'
+import { load, LoaderOptions } from '@loaders.gl/core'
 import { _GeoJSONLoader } from '@loaders.gl/json'
 import { GeoPackageLoader } from '@loaders.gl/geopackage'
+import { KMLLoader } from '@loaders.gl/kml'
 import bbox from '@turf/bbox'
 import { featureCollection } from '@turf/helpers'
 import { v4 as uuidv4 } from 'uuid'
@@ -155,8 +156,11 @@ export class FeaturesGeoLayer extends GeoLayer {
     }
 }
 
-export async function* geoLayerFromFile(file: File): AsyncIterable<GeoLayer> {
-    const options = {
+export async function* geoLayerFromFile(
+    file: string | File
+): AsyncIterable<GeoLayer> {
+    const options: LoaderOptions = {
+        worker: false,
         geopackage: {
             sqlJsCDN: 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/',
         },
@@ -167,25 +171,31 @@ export async function* geoLayerFromFile(file: File): AsyncIterable<GeoLayer> {
         },
     }
 
-    let ext = file.name.toLowerCase().split('.').pop()
+    let name = typeof file == 'string' ? file : file.name
+
+    let ext = name.toLowerCase().split('.').pop()
     console.log(`Loading ${ext} file`)
 
     switch (ext) {
-        case 'geojson':
-            const geojson = await load(file, _GeoJSONLoader, options)
-            yield new FeaturesGeoLayer({
-                name: file.name,
-                features: geojson.features,
-            })
-            break
         case 'gpkg':
             const geopackage: any = await load(file, GeoPackageLoader, options)
             for (let layerName in geopackage) {
                 yield new FeaturesGeoLayer({
-                    name: `${file.name}-${layerName}`,
+                    name: `${name}-${layerName}`,
                     features: geopackage[layerName],
                 })
             }
+            break
+        default:
+            const rawLayer: any = await load(
+                file,
+                [_GeoJSONLoader, KMLLoader],
+                options
+            )
+            yield new FeaturesGeoLayer({
+                name: name,
+                features: rawLayer.features,
+            })
             break
     }
 }

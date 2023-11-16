@@ -8,6 +8,7 @@ import {
     Grid,
     Tab,
     Tabs,
+    Typography,
 } from '@mui/material'
 import React from 'react'
 import { DropzoneArea } from 'react-mui-dropzone'
@@ -76,7 +77,7 @@ const AddXYZTileLayer = (cb: CloseFormCallback) => {
                 maxZoom: 19,
             }}
             validationSchema={XYZTileLayerSchema}
-            onSubmit={(values, actions) => {
+            onSubmit={(values) => {
                 cb()
                 dispatch(addLayer(new TileGeoLayer(values)))
             }}
@@ -129,27 +130,67 @@ const AddXYZTileLayer = (cb: CloseFormCallback) => {
     )
 }
 
+const RemoteFileSchema = Yup.object().shape({
+    url: Yup.string().required('Required').url('Non valid URL'),
+})
+
 const AddFileLayerForm = (cb: CloseFormCallback) => {
     const dispatch = useAppDispatch()
 
-    const handleChange = async (files: File[]) => {
-        if (files.length === 0) return
-        cb()
-        for (const file of files) {
-            for await (let newLayer of geoLayerFromFile(file)) {
-                dispatch(addLayer(newLayer))
-            }
+    const loadFile = async (file: string | File) => {
+        for await (let newLayer of geoLayerFromFile(file)) {
+            dispatch(addLayer(newLayer))
         }
     }
 
+    const handleChange = (files: File[]) => {
+        if (files.length === 0) return
+        cb()
+        files.forEach(loadFile)
+    }
+
     return (
-        <DropzoneArea
-            acceptedFiles={['.gpkg', '.geojson']}
-            filesLimit={1000}
-            maxFileSize={1024 * 10e6}
-            dropzoneText={'Drag and drop an file here or click'}
-            onChange={handleChange.bind(this)}
-        />
+        <Box sx={{ p: 2 }} textAlign="center">
+            Supported files: GPKG, GeoJSON, KML
+            {spacer()}
+            <DropzoneArea
+                acceptedFiles={['.gpkg', '.geojson', '.kml']}
+                filesLimit={1000}
+                maxFileSize={1024 * 1e6}
+                dropzoneText={'Drag and drop files here or click'}
+                onChange={handleChange.bind(this)}
+            />
+            {spacer()}
+            <Typography>or</Typography>
+            {spacer()}
+            <Formik
+                initialValues={{ url: '' }}
+                validationSchema={RemoteFileSchema}
+                onSubmit={(values) => {
+                    cb()
+                    loadFile(values.url)
+                }}
+            >
+                <Form>
+                    <Field
+                        component={TextField}
+                        id="url"
+                        name="url"
+                        label="URL"
+                        fullWidth={true}
+                    />
+                    {spacer()}
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        fullWidth={true}
+                        sx={{ h: 1 }}
+                    >
+                        Submit
+                    </Button>
+                </Form>
+            </Formik>
+        </Box>
     )
 }
 

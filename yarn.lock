@@ -1978,6 +1978,16 @@
     "@loaders.gl/loader-utils" "3.4.14"
     "@loaders.gl/schema" "3.4.14"
 
+"@loaders.gl/kml@^3.4.14":
+  version "3.4.14"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/kml/-/kml-3.4.14.tgz#9169a0ddfb43b7e45d583ce8a32134e9df2d069d"
+  integrity sha512-/E/aClBgrEH/o81IDw6PlfqRva5XAzMEJtBo7AK7KaoTbUYqXegjiBmLZ9CgBvPt1wsWYyYbdCxG/jwFeu4eyg==
+  dependencies:
+    "@loaders.gl/gis" "3.4.14"
+    "@loaders.gl/loader-utils" "3.4.14"
+    "@loaders.gl/schema" "3.4.14"
+    "@tmcw/togeojson" "^4.5.0"
+
 "@loaders.gl/loader-utils@3.4.14", "@loaders.gl/loader-utils@^3.4.13":
   version "3.4.14"
   resolved "https://registry.yarnpkg.com/@loaders.gl/loader-utils/-/loader-utils-3.4.14.tgz#d94decc279fd2304b8762c87d8d9626058d91f21"
@@ -2730,6 +2740,11 @@
   dependencies:
     "@babel/runtime" "^7.12.5"
 
+"@tmcw/togeojson@^4.5.0":
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/@tmcw/togeojson/-/togeojson-4.7.0.tgz#071d6d6d01f0aa86299cc98e3cdb102f1119241d"
+  integrity sha512-edAPymgIEIY/jrEmATYe56a46XHvPVm7SXhf29h7jSAUrRhLOIFIlbHPCsic/gGDSvWODTSioRFpXgou47ZLYg==
+
 "@tootallnate/once@1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
@@ -3204,9 +3219,9 @@
     "@types/node" "*"
 
 "@types/sql.js@^1.4.2":
-  version "1.4.7"
-  resolved "https://registry.yarnpkg.com/@types/sql.js/-/sql.js-1.4.7.tgz#991a07279e0564d114cac72d008e64793cc9ecfd"
-  integrity sha512-6NsC/6ECtyVdkEAw1jJcY44uFagQtL9dj+RxN8WceGcbON/E53IP/+/7zah2NnfzNzLnjAViiGLccWuAuKotgw==
+  version "1.4.9"
+  resolved "https://registry.yarnpkg.com/@types/sql.js/-/sql.js-1.4.9.tgz#31d2bed39aa63e56ada7a4469aa6f19ee2c74b94"
+  integrity sha512-ep8b36RKHlgWPqjNG9ToUrPiwkhwh0AEzy883mO5Xnd+cL6VBH1EvSjBAAuxLUFF2Vn/moE3Me6v9E1Lo+48GQ==
   dependencies:
     "@types/emscripten" "*"
     "@types/node" "*"
