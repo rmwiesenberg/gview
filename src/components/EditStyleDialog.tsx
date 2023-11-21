@@ -241,6 +241,13 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                                                 >
                                                     pixels
                                                 </MenuItem>
+
+                                                <MenuItem
+                                                    value={'common'}
+                                                    key="common"
+                                                >
+                                                    common
+                                                </MenuItem>
                                             </Select>
                                         </Grid>
                                     </Grid>
@@ -311,6 +318,13 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                                                     key="pixels"
                                                 >
                                                     pixels
+                                                </MenuItem>
+
+                                                <MenuItem
+                                                    value={'common'}
+                                                    key="common"
+                                                >
+                                                    common
                                                 </MenuItem>
                                             </Select>
                                         </Grid>

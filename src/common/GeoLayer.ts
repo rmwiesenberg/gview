@@ -158,6 +158,8 @@ export class FeaturesGeoLayer extends GeoLayer {
             pickable: true,
             stroked: true,
             filled: true,
+            material: false,
+            lineBillboard: true,
             pointType: 'circle',
             lineWidthMinPixels: 1,
             pointRadiusMinPixels: 1,
