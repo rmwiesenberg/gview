@@ -72,6 +72,18 @@ export const LayerMenu = (
                         Focus on layer
                     </MenuItem>
                 )}
+
+                <MenuItem
+                    onClick={() => {
+                        if (layer != null) setIsEditStyleActive(true)
+                    }}
+                >
+                    <ListItemIcon>
+                        <FormatPaint fontSize="small" />
+                    </ListItemIcon>
+                    Edit style
+                </MenuItem>
+
                 <MenuItem
                     onClick={() => {
                         if (layer != null) setIsEditLayerActive(true)
@@ -82,18 +94,7 @@ export const LayerMenu = (
                     </ListItemIcon>
                     Edit properties
                 </MenuItem>
-                {layer?.type === 'feature' && (
-                    <MenuItem
-                        onClick={() => {
-                            if (layer != null) setIsEditStyleActive(true)
-                        }}
-                    >
-                        <ListItemIcon>
-                            <FormatPaint fontSize="small" />
-                        </ListItemIcon>
-                        Edit style
-                    </MenuItem>
-                )}
+
                 <MenuItem
                     onClick={() => {
                         if (layer != null) dispatch(removeLayer(layer))

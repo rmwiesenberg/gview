@@ -102,6 +102,8 @@ export interface Style {
     getPointRadius?: GetNumber
     pointRadiusScale?: number
     pointRadiusUnits?: WidthUnits
+
+    full3D?: boolean
 }
 
 export const getDefaultStyle = (): Style => {
@@ -121,5 +123,7 @@ export const getNewFeatureStyle = (): Style => {
         getPointRadius: new RawGetNumber(1),
         pointRadiusScale: 1,
         pointRadiusUnits: 'pixels',
+
+        full3D: false,
     }
 }

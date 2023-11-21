@@ -137,6 +137,8 @@ export class FeaturesGeoLayer extends GeoLayer {
             pointRadiusScale: style.pointRadiusScale,
             getRadiusUnits: style.pointRadiusUnits,
 
+            _full3d: style.full3D,
+
             updateTriggers: {
                 getFillColor: style.getFillColor,
                 getLineColor: style.getStrokeColor,
