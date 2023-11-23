@@ -9,8 +9,8 @@ import {
     Grid,
     InputLabel,
     MenuItem,
-    Select,
     Slider,
+    Select,
     TextField,
     Typography,
 } from '@mui/material'
@@ -29,7 +29,11 @@ import {
 import Sketch from '@uiw/react-color-sketch'
 import { Field, FieldProps, Form, Formik } from 'formik'
 import * as Yup from 'yup'
-import { CheckboxWithLabel, TextField as FormikTextField } from 'formik-mui'
+import {
+    CheckboxWithLabel,
+    TextField as FormikTextField,
+    Select as FormikSelect,
+} from 'formik-mui'
 
 type CloseFormCallback = () => void
 
@@ -124,6 +128,62 @@ const SetNumberField: React.FC<
     )
 }
 
+const EditScaledField = (
+    title: string,
+    widthFieldName: string,
+    scaleFieldName: string,
+    unitsFieldName: string
+) => {
+    return (
+        <Grid container spacing={2}>
+            <Grid item xs={12}>
+                <Typography>{title}</Typography>
+            </Grid>
+            <Grid item xs={4}>
+                <Field
+                    id={widthFieldName}
+                    name={widthFieldName}
+                    component={SetNumberField}
+                />
+            </Grid>
+            <Grid item xs={1}>
+                <div
+                    style={{
+                        justifyContent: 'center',
+                        height: 1,
+                        lineHeight: 1,
+                        textAlign: 'center',
+                    }}
+                >
+                    <h3>*</h3>
+                </div>
+            </Grid>
+            <Grid item xs={4}>
+                <Field
+                    id={scaleFieldName}
+                    name={scaleFieldName}
+                    label="scale"
+                    size="small"
+                    component={FormikTextField}
+                />
+            </Grid>
+            <Grid item xs={3}>
+                <Field
+                    id={unitsFieldName}
+                    name={unitsFieldName}
+                    size="small"
+                    fullWidth
+                    component={FormikSelect}
+                >
+                    <MenuItem value={'meters'}>meters</MenuItem>
+                    <MenuItem value={'pixels'}>pixels</MenuItem>
+                    <MenuItem value={'common'}>common</MenuItem>
+                </Field>
+            </Grid>
+        </Grid>
+    )
+}
+
 const StyleSchema = Yup.object().shape({
     opacity: Yup.number().min(0).max(1),
     strokeWidthScale: Yup.number().min(1).max(9),
@@ -151,7 +211,7 @@ export const EditStyleDialog = (props: EditStyleProps) => {
                 >
                     {({ submitForm, handleChange, values }) => (
                         <Form>
-                            <Grid container>
+                            <Grid container spacing={2}>
                                 {values.getStrokeColor && (
                                     <Grid item xs={6}>
                                         <Typography>
@@ -183,152 +243,24 @@ export const EditStyleDialog = (props: EditStyleProps) => {
 
                             {values.getStrokeWidth && (
                                 <div>
-                                    <Grid container>
-                                        <Grid item xs={12}>
-                                            <Typography>
-                                                Stroke Width
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Field
-                                                id="getStrokeWidth"
-                                                name="getStrokeWidth"
-                                                component={SetNumberField}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={1}>
-                                            <div
-                                                style={{
-                                                    justifyContent: 'center',
-                                                    height: 1,
-                                                    lineHeight: 1,
-                                                    textAlign: 'center',
-                                                }}
-                                            >
-                                                <h3>*</h3>
-                                            </div>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Field
-                                                id="strokeWidthScale"
-                                                name="strokeWidthScale"
-                                                label="scale"
-                                                size="small"
-                                                component={FormikTextField}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={5}>
-                                            <Select
-                                                id="strokeWidthUnits"
-                                                name="strokeWidthUnits"
-                                                size="small"
-                                                fullWidth
-                                                defaultValue={
-                                                    values.strokeWidthUnits
-                                                }
-                                                onChange={handleChange}
-                                            >
-                                                <MenuItem
-                                                    value={'meters'}
-                                                    key="meters"
-                                                >
-                                                    meters
-                                                </MenuItem>
-
-                                                <MenuItem
-                                                    value={'pixels'}
-                                                    key="pixels"
-                                                >
-                                                    pixels
-                                                </MenuItem>
-
-                                                <MenuItem
-                                                    value={'common'}
-                                                    key="common"
-                                                >
-                                                    common
-                                                </MenuItem>
-                                            </Select>
-                                        </Grid>
-                                    </Grid>
+                                    {EditScaledField(
+                                        'Stroke Width',
+                                        'getStrokeWidth',
+                                        'strokeWidthScale',
+                                        'strokeWidthUnits'
+                                    )}
                                     {spacer()}
                                 </div>
                             )}
 
                             {values.getPointRadius && (
                                 <div>
-                                    <Grid container>
-                                        <Grid item xs={12}>
-                                            <Typography>
-                                                Point Radius
-                                            </Typography>
-                                        </Grid>
-
-                                        <Grid item xs={3}>
-                                            <Field
-                                                id="getPointRadius"
-                                                name="getPointRadius"
-                                                component={SetNumberField}
-                                            />
-                                        </Grid>
-
-                                        <Grid item xs={1}>
-                                            <div
-                                                style={{
-                                                    justifyContent: 'center',
-                                                    height: 1,
-                                                    lineHeight: 1,
-                                                    textAlign: 'center',
-                                                }}
-                                            >
-                                                <h3>*</h3>
-                                            </div>
-                                        </Grid>
-
-                                        <Grid item xs={3}>
-                                            <Field
-                                                id="pointRadiusScale"
-                                                name="pointRadiusScale"
-                                                label="scale"
-                                                size="small"
-                                                component={FormikTextField}
-                                            />
-                                        </Grid>
-
-                                        <Grid item xs={5}>
-                                            <Select
-                                                id="pointRadiusUnits"
-                                                name="pointRadiusUnits"
-                                                size="small"
-                                                fullWidth
-                                                defaultValue={
-                                                    values.pointRadiusUnits
-                                                }
-                                                onChange={handleChange}
-                                            >
-                                                <MenuItem
-                                                    value={'meters'}
-                                                    key="meters"
-                                                >
-                                                    meters
-                                                </MenuItem>
-
-                                                <MenuItem
-                                                    value={'pixels'}
-                                                    key="pixels"
-                                                >
-                                                    pixels
-                                                </MenuItem>
-
-                                                <MenuItem
-                                                    value={'common'}
-                                                    key="common"
-                                                >
-                                                    common
-                                                </MenuItem>
-                                            </Select>
-                                        </Grid>
-                                    </Grid>
+                                    {EditScaledField(
+                                        'Point Radius',
+                                        'getPointRadius',
+                                        'pointRadiusScale',
+                                        'pointRadiusUnits'
+                                    )}
                                     {spacer()}
                                 </div>
                             )}
