@@ -1,15 +1,17 @@
 import { Feature } from 'geojson'
 import { Dictionary } from '@reduxjs/toolkit'
+import { FeaturesGeoLayer } from './GeoLayer'
 
 type GetterType = 'field' | 'raw'
+type GenFunc<T> = (feature: Feature) => T
 class FieldGet<T> {
     type: GetterType = 'field'
     field: string
     defaultValue: T
-    genFunc: () => T
+    genFunc: GenFunc<T>
     valueLookup: Dictionary<T> = {}
 
-    constructor(field: string, defaultValue: T, genFunc: () => T) {
+    constructor(field: string, defaultValue: T, genFunc: GenFunc<T>) {
         this.field = field
         this.genFunc = genFunc
         this.defaultValue = defaultValue
@@ -25,7 +27,7 @@ class FieldGet<T> {
         const storedValue = this.valueLookup[fieldValue]
         if (storedValue) return storedValue
 
-        const newValue = this.genFunc()
+        const newValue = this.genFunc(feature)
         this.valueLookup[fieldValue] = newValue
         return newValue
     }
@@ -62,7 +64,26 @@ export class FieldGetColor extends FieldGet<Color> implements GetColor {
     getColor = this.get
 
     constructor(field: string, defaultValue: Color) {
-        super(field, defaultValue, () => randomColor())
+        super(field, defaultValue, (feature: Feature) => {
+            // The caller should have already check the null-ness of this field.
+            let value = feature.properties![this.field]!
+
+            let isString = typeof value === 'string' || value instanceof String
+            if (
+                isString &&
+                value.startsWith('#') &&
+                (value.length === 7 || value.length === 9)
+            ) {
+                let color = []
+                for (let i = 1; i < value.length - 1; i += 2) {
+                    color.push(
+                        Number(`0x${value.slice(i, i + 2).toLowerCase()}`)
+                    )
+                }
+                if (!color.includes(NaN)) return color as Color
+            }
+            return randomColor()
+        })
     }
 }
 
@@ -109,12 +130,18 @@ export interface Style {
 export const getDefaultStyle = (): Style => {
     return { opacity: 0.8 }
 }
-export const getNewFeatureStyle = (): Style => {
+export const getNewFeatureStyle = (layer: FeaturesGeoLayer): Style => {
     return {
         ...getDefaultStyle(),
 
-        getFillColor: new RawGetColor(randomColor()),
-        getStrokeColor: new RawGetColor(randomColor()),
+        getFillColor:
+            'fill' in layer.hashable_props
+                ? new FieldGetColor('fill', randomColor())
+                : new RawGetColor(randomColor()),
+        getStrokeColor:
+            'stroke' in layer.hashable_props
+                ? new FieldGetColor('stroke', randomColor())
+                : new RawGetColor(randomColor()),
 
         getStrokeWidth: new RawGetNumber(1),
         strokeWidthScale: 1,
@@ -124,6 +151,6 @@ export const getNewFeatureStyle = (): Style => {
         pointRadiusScale: 1,
         pointRadiusUnits: 'pixels',
 
-        full3D: false,
+        full3D: true,
     }
 }

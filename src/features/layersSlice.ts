@@ -1,6 +1,6 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { createSlice, Dictionary } from '@reduxjs/toolkit'
-import { GeoLayer } from '../common/GeoLayer'
+import { FeaturesGeoLayer, GeoLayer } from '../common/GeoLayer'
 import { getDefaultStyle, getNewFeatureStyle, Style } from '../common/Style'
 
 export interface LayersState {
@@ -27,6 +27,13 @@ interface ReorderParams {
     target: number
 }
 
+const getNewLayerStyle = (layer: GeoLayer): Style => {
+    if (layer.type === 'feature') {
+        return getNewFeatureStyle(layer as FeaturesGeoLayer)
+    }
+    return getDefaultStyle()
+}
+
 export const layersSlice = createSlice({
     name: 'layers',
     initialState,
@@ -37,10 +44,7 @@ export const layersSlice = createSlice({
             state.layers[newLayer.id] = newLayer
             state.ordered = [newLayer, ...state.ordered]
             state.isActive[newLayer.id] = true
-            state.styles[newLayer.id] =
-                newLayer.type === 'feature'
-                    ? getNewFeatureStyle()
-                    : getDefaultStyle()
+            state.styles[newLayer.id] = getNewLayerStyle(newLayer)
 
             return state
         },
@@ -52,10 +56,7 @@ export const layersSlice = createSlice({
             state.layers[newLayer.id] = newLayer
             state.ordered = [newLayer, ...state.ordered]
             state.isActive[newLayer.id] = true
-            state.styles[newLayer.id] =
-                newLayer.type === 'feature'
-                    ? getNewFeatureStyle()
-                    : getDefaultStyle()
+            state.styles[newLayer.id] = getNewLayerStyle(newLayer)
 
             return state
         },
@@ -79,10 +80,7 @@ export const layersSlice = createSlice({
                 ...state.ordered.slice(i),
             ]
             state.isActive[newLayer.id] = true
-            state.styles[newLayer.id] =
-                newLayer.type === 'feature'
-                    ? getNewFeatureStyle()
-                    : getDefaultStyle()
+            state.styles[newLayer.id] = getNewLayerStyle(newLayer)
 
             return state
         },
