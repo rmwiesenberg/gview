@@ -9,8 +9,8 @@ import {
     Grid,
     InputLabel,
     MenuItem,
-    Slider,
     Select,
+    Slider,
     TextField,
     Typography,
 } from '@mui/material'
@@ -31,8 +31,8 @@ import { Field, FieldProps, Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import {
     CheckboxWithLabel,
-    TextField as FormikTextField,
     Select as FormikSelect,
+    TextField as FormikTextField,
 } from 'formik-mui'
 
 type CloseFormCallback = () => void
@@ -89,7 +89,6 @@ const SetColorField: React.FC<
                     b: field.value.defaultValue[2],
                     a: field.value.defaultValue[3] ?? 1,
                 })}
-                disableAlpha={true}
                 onChange={(inputColor) => {
                     const rgb = inputColor.rgb
                     const defaultValue: Color = [rgb.r, rgb.g, rgb.b]
