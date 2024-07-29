@@ -72,13 +72,14 @@ export class FieldGetColor extends FieldGet<Color> implements GetColor {
             if (
                 isString &&
                 value.startsWith('#') &&
-                (value.length === 7 || value.length === 9)
+                [4, 5, 7, 9].includes(value.length)
             ) {
+                let step = [4, 5].includes(value.length) ? 1 : 2
                 let color = []
-                for (let i = 1; i < value.length - 1; i += 2) {
-                    color.push(
-                        Number(`0x${value.slice(i, i + 2).toLowerCase()}`)
-                    )
+                for (let i = 1; i < value.length; i += step) {
+                    let slice = value.slice(i, i + step).toLowerCase()
+                    if (step === 1) slice = slice + slice
+                    color.push(parseInt(slice, 16))
                 }
                 if (!color.includes(NaN)) return color as Color
             }
